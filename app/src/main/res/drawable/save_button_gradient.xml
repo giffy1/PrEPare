@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Used to create a pretty-looking save button with gradient backgrounds colors.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+<item android:state_pressed="true" >
+    <shape android:shape="rectangle"  >
+        <corners android:radius="3dip" />
+        <stroke android:width="1dip" android:color="#5e59A4" />
+        <gradient android:angle="-90" android:startColor="#343593" android:endColor="#687aB2"  />
+    </shape>
+</item>
+<item android:state_focused="true">
+    <shape android:shape="rectangle"  >
+        <corners android:radius="3dip" />
+        <stroke android:width="1dip" android:color="#5e59A4" />
+        <solid android:color="#5865Ae"/>
+    </shape>
+</item>
+<item >
+    <shape android:shape="rectangle"  >
+        <corners android:radius="3dip" />
+        <stroke android:width="1dip" android:color="#5e59A4" />
+        <gradient android:angle="-90" android:startColor="#8d9af3" android:endColor="#5865Ae" />
+    </shape>
+</item>
+</selector>

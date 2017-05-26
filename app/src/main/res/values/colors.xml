@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color_primary">#3F51B5</color>
+    <color name="color_primary_dark">#303F9F</color>
+    <color name="color_accent">#FF4081</color>
+
+    <color name="color_list_item_selected">#4d90fe</color>
+    <color name="color_list_item_default">#ffffff</color>
+
+    <color name="color_dose_late">#FFFF0C</color>
+    <color name="color_dose_taken">#9BC058</color>
+    <color name="color_dose_missed">#C04B4D</color>
+    <color name="color_dose_future">#FFFFFF</color>
+    <color name="color_border">#000000</color>
+
+    <color name="color_transition_details_swipe">#2060FF53</color>
+    <color name="color_calendar_item_background_selected">#3865FF55</color>
+
+    <color name="color_calendar_item_date_text">#060606</color>
+    <color name="white">#ffffff</color>
+</resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This dialog allows the user to select a time of day.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1">
+
+    <TimePicker
+        android:id="@+id/time_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:id="@+id/dialog_time_button_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent" >
+        <Button
+            android:id="@+id/btn_time_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_label_cancel"
+            android:textStyle="bold"
+            android:background="@drawable/cancel_button_gradient"
+            android:textAllCaps="false"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            tools:ignore="ButtonStyle">
+        </Button>
+
+        <Button
+            android:id="@+id/btn_time_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_label_save"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:background="@drawable/save_button_gradient"
+            android:textAllCaps="false"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            tools:ignore="ButtonStyle">
+        </Button>
+    </LinearLayout>
+
+</LinearLayout>

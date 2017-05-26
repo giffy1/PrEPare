@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The calendar activity is the main UI which displays the interactive calendar along with
+    details regarding past adherence or future schedules for the selected date.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<android.support.v7.widget.Toolbar
+		android:id="@+id/my_toolbar"
+		android:layout_width="match_parent"
+		android:layout_height="?attr/actionBarSize"
+		android:background="?attr/colorPrimary"
+		android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+		app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+
+		android:elevation="4dp"
+		tools:targetApi="lollipop" />
+
+		<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/header"
+			android:orientation="horizontal"
+			android:background="@drawable/header_background"
+			android:gravity="start">
+			<TextView
+				android:id="@+id/previous"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:padding="5dp"
+				android:textSize="14sp"
+				android:textStyle="bold"
+				android:textColor="@color/white"
+				android:gravity="center_horizontal"
+				android:text="@string/change_month_previous"
+				android:clickable="true" />
+
+				<TextView
+					android:id="@+id/title"
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:padding="5dp"
+					android:textSize="14sp"
+					android:textStyle="bold"
+					android:textColor="@color/white"
+					android:layout_centerHorizontal="true"
+					android:gravity="center_horizontal" />
+
+				<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:gravity="end">
+
+					<TextView
+						android:id="@+id/next"
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:padding="5dp"
+						android:textSize="14sp"
+						android:textStyle="bold"
+						android:textColor="@color/white"
+						android:gravity="center_horizontal"
+						android:text="@string/change_month_next"
+						android:clickable="true" />
+				</LinearLayout>
+		</RelativeLayout>
+
+	<GridView xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/gvHeaders"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+
+		android:numColumns="7"
+		android:verticalSpacing="2dp"
+		android:horizontalSpacing="2dp"
+		android:stretchMode="columnWidth"
+
+		android:gravity="center" />
+
+	<GridView xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/gridview"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+
+		android:numColumns="7"
+		android:verticalSpacing="2dp"
+		android:horizontalSpacing="2dp"
+		android:stretchMode="columnWidth"
+
+		android:gravity="center" />
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="horizontal">
+		
+		<TextView
+			android:id="@+id/txtDate"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:layout_margin="2dp"
+			android:textStyle="bold"
+			android:textColor="@color/color_primary"
+			android:visibility="invisible" />
+
+		<LinearLayout
+			android:id="@+id/details"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"/>
+	</LinearLayout>
+
+</LinearLayout>

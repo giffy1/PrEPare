@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This view displays medication adherence data in the form of blocks (just views
+    with a background) colored according to the adherence type. It is the simple
+    version, intended to be embedded in the calendar date view, and thus includes
+    no medication image, name or schedule and no interactivity.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="0dp"
+android:orientation="horizontal"
+android:layout_weight="1"
+android:gravity="center"
+android:layout_marginBottom="4dp">
+
+<View
+	android:id="@+id/pill_adherence1"
+	android:layout_width="0dp"
+	android:layout_height="8dp"
+	android:layout_weight="1"
+	android:gravity="center"
+	android:layout_marginRight="2dp"
+	android:layout_marginLeft="2dp"/>
+
+<View
+	android:id="@+id/pill_adherence2"
+	android:layout_width="0dp"
+	android:layout_height="8dp"
+	android:layout_weight="1"
+	android:gravity="center"
+	android:layout_marginRight="2dp"
+	android:layout_marginLeft="2dp"/>
+</LinearLayout>

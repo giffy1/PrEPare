@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This view displays the date within a calendar item.
+-->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/date"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+
+	android:textAlignment="center"
+	android:textSize="14sp"
+	android:textStyle="bold"
+	android:textColor="@color/color_calendar_item_date_text"
+	android:layout_marginBottom="6dp"/>

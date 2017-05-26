@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The settings activity is where the user can select medications from a list and edit
+    their information, e.g. schedule, dosage, or image.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:weightSum="1">
+
+	<android.support.v7.widget.Toolbar
+		android:id="@+id/my_toolbar"
+		android:layout_width="match_parent"
+		android:layout_height="?attr/actionBarSize"
+		android:background="?attr/colorPrimary"
+		android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+		app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+		android:elevation="4dp"
+		tools:targetApi="lollipop" />
+
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/dialog_header_adjust_dosage"
+		android:textStyle="bold"
+		android:textSize="18sp"
+		android:gravity="center"
+		android:background="@color/color_primary_dark"
+		android:textColor="@color/white"/>
+
+	<ListView
+		android:id="@+id/lvMedications"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"/>
+
+	<LinearLayout
+		android:id="@+id/dialog_button_layout"
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent" >
+		<Button
+			android:id="@+id/btn_cancel_settings"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="@string/button_label_cancel"
+			android:textStyle="bold"
+			android:background="@drawable/cancel_button_gradient"
+			android:textAllCaps="false"
+			android:layout_marginTop="5dp"
+			android:layout_marginBottom="5dp"
+			android:layout_marginLeft="5dp"
+			android:layout_marginRight="5dp"
+			tools:ignore="ButtonStyle">
+		</Button>
+		<Button
+			android:id="@+id/btn_adjust"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="@string/button_label_adjust"
+			android:textStyle="bold"
+			android:textColor="@color/white"
+			android:background="@drawable/save_button_gradient"
+			android:textAllCaps="false"
+			android:layout_marginTop="5dp"
+			android:layout_marginBottom="5dp"
+			android:layout_marginLeft="5dp"
+			android:layout_marginRight="5dp"
+			tools:ignore="ButtonStyle">
+		</Button>
+	</LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PrEPare</string>
+
+    <string name="button_label_save">Save</string>
+    <string name="button_label_cancel">Cancel</string>
+    <string name="button_label_adjust">Adjust</string>
+
+    <string name="dialog_header_change_reminder">Change Reminder</string>
+    <string name="dialog_header_adjust_dosage">Adjust Dosage</string>
+    <string name="dialog_header_specify_dosage">Specify Dosage</string>
+    <string name="dialog_header_upload_photo">Upload Photo</string>
+
+    <string name="am">AM</string>
+    <string name="pm">PM</string>
+
+    <string name="upload_option_take_photo">Take New Photo</string>
+    <string name="upload_option_from_gallery">Choose From Gallery</string>
+    <string name="upload_option_reset">Reset to Default</string>
+
+    <string name="refresh_content_description">Refreshes the calendar with today\'s date selected.</string>
+
+    <string name="plot_option_by_month">By Month</string>
+    <string name="plot_option_by_week">By Week</string>
+
+    <string name="change_month_previous"><![CDATA[<<]]></string>
+    <string name="change_month_next"><![CDATA[>>]]></string>
+
+    <string name="menu_item_title_chart">Chart My Progress</string>
+    <string name="menu_item_title_settings">Settings</string>
+</resources>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The progress activity aggregates and visualizes adherence data weekly or monthly.
+    The user can select medications for which to graph adherence data.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:ap="http://schemas.android.com/apk/res-auto"
+    tools:context="cs.umass.edu.customcalendar.view.activities.ProgressActivity"
+    android:weightSum="2"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        ap:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+
+        android:elevation="4dp"
+        tools:targetApi="lollipop" />
+
+    <LinearLayout android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.androidplot.xy.XYPlot
+            style="@style/APDefacto.Light"
+            android:id="@+id/progress_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            ap:lineLabels="left|bottom"
+            ap:lineLabelRotationBottom="-45"/>
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+        <RadioGroup
+            android:id="@+id/radio_plot_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp">
+
+            <RadioButton
+                android:id="@+id/radio_by_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/plot_option_by_month"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/radio_by_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/plot_option_by_week" />
+
+        </RadioGroup>
+
+        <ListView
+            android:id="@+id/lv_choose_medications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This view includes a calendar icon displaying the current date.
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/ic_calendar"
+        android:src="@drawable/ic_date_range_white_24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:contentDescription="@string/refresh_content_description" />
+
+    <TextView
+        android:id="@+id/txt_today"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_marginTop="3dp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:layout_alignStart="@id/ic_calendar"
+        android:layout_alignEnd="@id/ic_calendar"
+
+        android:textSize="10sp"
+        tools:ignore="SmallSp" />
+
+
+
+</RelativeLayout>
