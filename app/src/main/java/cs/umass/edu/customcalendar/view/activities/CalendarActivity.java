@@ -55,6 +55,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -96,6 +97,9 @@ public class CalendarActivity extends AppCompatActivity {
 
 	/** Maps a medication to a schedule (a list of times to take the medication). **/
 	private Map<Medication, Calendar[]> dailySchedule = new HashMap<>();
+
+	/** Maps a medication to a unique Mac Address. **/
+	private Map<Medication, String> addressMapping = new HashMap<>();
 
 	/** Indicates whether the schedule details should be displayed, i.e. whether {@link #detailsView} is visible. **/
 	private boolean showDetails = false;
@@ -140,6 +144,7 @@ public class CalendarActivity extends AppCompatActivity {
 		dosageMapping = preferences.getDosageMapping();
 		dailySchedule = preferences.getDailySchedule();
 		adherenceData = preferences.getAdherenceData();
+		addressMapping = preferences.getAddressMapping();
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -164,13 +169,10 @@ public class CalendarActivity extends AppCompatActivity {
 		TextView txtDate = (TextView) v.findViewById(R.id.txt_today);
 		txtDate.setText(String.valueOf(today.get(Calendar.DATE)));
 
-		v.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				finish();
-				startActivity(getIntent()); // refresh activity
-			}
-		});
+		v.setOnClickListener(view -> {
+            finish();
+            startActivity(getIntent()); // refresh activity
+        });
 
 		getSupportActionBar().setCustomView(v);
 
@@ -199,45 +201,40 @@ public class CalendarActivity extends AppCompatActivity {
 		});
 
 		TextView next  = (TextView) findViewById(R.id.next);
-		next.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				nextMonth();
-			}
-		});
+		next.setOnClickListener(v1 -> nextMonth());
 
 		detailsView = findViewById(R.id.details);
 
-		gridview.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-				TextView date = (TextView)v.findViewById(R.id.date);
-				if(date != null && !date.getText().equals("")) {
-					if (date.getText().toString().equals(String.valueOf(selectedDate.get(Calendar.DATE)))){
-						showDetails = !showDetails;
-					} else {
-						showDetails = true;
-					}
-					selectedDate.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
-					selectedDate.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-					selectedDate.set(Calendar.DATE, Integer.valueOf(date.getText().toString()));
-					refresh();
-				}
-			}
-		});
+		gridview.setOnItemClickListener((parent, v12, position, id) -> {
+            TextView date = (TextView) v12.findViewById(R.id.date);
+            if(date != null && !date.getText().equals("")) {
+                if (date.getText().toString().equals(String.valueOf(selectedDate.get(Calendar.DATE)))){
+                    showDetails = !showDetails;
+                } else {
+                    showDetails = true;
+                }
+                selectedDate.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
+                selectedDate.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+                selectedDate.set(Calendar.DATE, Integer.valueOf(date.getText().toString()));
+                refresh();
+            }
+        });
 
-		motionEventListener.setOnSwipeListener(gridview, new CustomMotionEventListener.OnSwipeListener() {
-			@Override
-			public void onSwipe(Direction direction) {
-				if (direction==Direction.LEFT){
-					nextMonth();
-				} else if (direction == Direction.RIGHT) {
-					previousMonth();
-				}
-			}
-		});
+		motionEventListener.setOnSwipeListener(gridview, direction -> {
+            if (direction== CustomMotionEventListener.OnSwipeListener.Direction.LEFT){
+                nextMonth();
+            } else if (direction == CustomMotionEventListener.OnSwipeListener.Direction.RIGHT) {
+                previousMonth();
+            }
+        });
 
-		motionEventListener.setOnSwipeListener(this, onDetailsSwiped);
+//		motionEventListener.setOnSwipeListener(detailsView, onDetailsSwiped);
+//		motionEventListener.setOnSwipeListener(this, onDetailsSwiped);
+
+		if (addressMapping == null){ // TODO
+			Intent selectDeviceIntent = new Intent(this, SelectDeviceActivity.class);
+			startActivity(selectDeviceIntent);
+		}
 	}
 
 	@Override
@@ -357,28 +354,25 @@ public class CalendarActivity extends AppCompatActivity {
 		for (int i = 0; i < adherenceChoices.length; i++){
 			adherenceChoices[i] = Adherence.AdherenceType.values()[i].toString();
 		}
-		b.setItems(adherenceChoices, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				Map<Medication, Adherence[]> selectedAdherence = adherenceData.get(dateKey);
-				Adherence[] dailyAdherence = selectedAdherence.get(medication);
-				dailyAdherence[index].setAdherenceType(Adherence.AdherenceType.values()[which]);
-				if (Adherence.AdherenceType.values()[which] == Adherence.AdherenceType.TAKEN){
-					dailyAdherence[index].setTimeTaken(dailySchedule.get(medication)[index]);
-				} else if (Adherence.AdherenceType.values()[which] == Adherence.AdherenceType.TAKEN_EARLY_OR_LATE){
-					Calendar timeToTake = (Calendar) dailySchedule.get(medication)[index].clone();
-					// random time if early or late:
-					int sign = (Math.random()>0.5 ? 1 : -1);
-					timeToTake.add(Calendar.HOUR, (int)(sign * (1 + 3*Math.random())));
-					timeToTake.add(Calendar.MINUTE, (int)(sign * (15 + 45*Math.random())));
-					dailyAdherence[index].setTimeTaken(timeToTake);
-				}
-				refresh();
-				ApplicationPreferences preferences = ApplicationPreferences.getInstance(CalendarActivity.this);
-				preferences.setAdherenceData(adherenceData);
-			}
-		});
+		b.setItems(adherenceChoices, (dialog, which) -> {
+            dialog.dismiss();
+            Map<Medication, Adherence[]> selectedAdherence = adherenceData.get(dateKey);
+            Adherence[] dailyAdherence = selectedAdherence.get(medication);
+            dailyAdherence[index].setAdherenceType(Adherence.AdherenceType.values()[which]);
+            if (Adherence.AdherenceType.values()[which] == Adherence.AdherenceType.TAKEN){
+                dailyAdherence[index].setTimeTaken(dailySchedule.get(medication)[index]);
+            } else if (Adherence.AdherenceType.values()[which] == Adherence.AdherenceType.TAKEN_EARLY_OR_LATE){
+                Calendar timeToTake = (Calendar) dailySchedule.get(medication)[index].clone();
+                // random time if early or late:
+                int sign = (Math.random()>0.5 ? 1 : -1);
+                timeToTake.add(Calendar.HOUR, (int)(sign * (1 + 3*Math.random())));
+                timeToTake.add(Calendar.MINUTE, (int)(sign * (15 + 45*Math.random())));
+                dailyAdherence[index].setTimeTaken(timeToTake);
+            }
+            refresh();
+            ApplicationPreferences preferences = ApplicationPreferences.getInstance(CalendarActivity.this);
+            preferences.setAdherenceData(adherenceData);
+        });
 		b.show();
 	}
 
@@ -394,44 +388,36 @@ public class CalendarActivity extends AppCompatActivity {
 		final TimePicker timePicker = (TimePicker) dialog.findViewById(R.id.time_picker);
 
 		Button cancelButton = (Button) dialog.findViewById(R.id.btn_time_cancel);
-		cancelButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dialog.dismiss();
-			}
-		});
+		cancelButton.setOnClickListener(v -> dialog.dismiss());
 
 		Button saveButton = (Button) dialog.findViewById(R.id.btn_time_save);
-		saveButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Calendar time = Utils.getTimeNoInterval(timePicker); // TODO: Store times taken
-				Map<Medication, Adherence[]> dailyAdherence = adherenceData.get(dateKey);
-				Adherence[] adherence = dailyAdherence.get(medication);
-				adherence[index].setTimeTaken(time);
+		saveButton.setOnClickListener(v -> {
+            Calendar time = Utils.getTimeNoInterval(timePicker); // TODO: Store times taken
+            Map<Medication, Adherence[]> dailyAdherence = adherenceData.get(dateKey);
+            Adherence[] adherence = dailyAdherence.get(medication);
+            adherence[index].setTimeTaken(time);
 
-				Calendar[] schedule = dailySchedule.get(medication);
-				Calendar timeToTake = (Calendar) time.clone();
-				timeToTake.set(Calendar.HOUR_OF_DAY, schedule[index].get(Calendar.HOUR_OF_DAY));
-				timeToTake.set(Calendar.MINUTE, schedule[index].get(Calendar.MINUTE));
-				Calendar upperBound = (Calendar) timeToTake.clone();
-				upperBound.add(Calendar.HOUR_OF_DAY, 1);
-				Calendar lowerBound = (Calendar) timeToTake.clone();
-				lowerBound.add(Calendar.HOUR_OF_DAY, -1);
+            Calendar[] schedule = dailySchedule.get(medication);
+            Calendar timeToTake = (Calendar) time.clone();
+            timeToTake.set(Calendar.HOUR_OF_DAY, schedule[index].get(Calendar.HOUR_OF_DAY));
+            timeToTake.set(Calendar.MINUTE, schedule[index].get(Calendar.MINUTE));
+            Calendar upperBound = (Calendar) timeToTake.clone();
+            upperBound.add(Calendar.HOUR_OF_DAY, 1);
+            Calendar lowerBound = (Calendar) timeToTake.clone();
+            lowerBound.add(Calendar.HOUR_OF_DAY, -1);
 
-				if (time.after(upperBound) || time.before(lowerBound)) {
-					adherence[index].setAdherenceType(Adherence.AdherenceType.TAKEN_EARLY_OR_LATE);
-				} else {
-					adherence[index].setAdherenceType(Adherence.AdherenceType.TAKEN);
-				}
+            if (time.after(upperBound) || time.before(lowerBound)) {
+                adherence[index].setAdherenceType(Adherence.AdherenceType.TAKEN_EARLY_OR_LATE);
+            } else {
+                adherence[index].setAdherenceType(Adherence.AdherenceType.TAKEN);
+            }
 
-				dialog.dismiss();
-				refresh();
+            dialog.dismiss();
+            refresh();
 
-				ApplicationPreferences preferences = ApplicationPreferences.getInstance(CalendarActivity.this);
-				preferences.setAdherenceData(adherenceData);
-			}
-		});
+            ApplicationPreferences preferences = ApplicationPreferences.getInstance(CalendarActivity.this);
+            preferences.setAdherenceData(adherenceData);
+        });
 
 		dialog.show();
 	}
@@ -455,22 +441,17 @@ public class CalendarActivity extends AppCompatActivity {
 			for (int i = 0; i < viewIDs.length; i++){
 				final int index = i;
 				adherenceViews[index] = details.findViewById(viewIDs[index]);
-				motionEventListener.setOnSwipeListener(adherenceViews[index], onDetailsSwiped);
-				adherenceViews[index].setOnLongClickListener(new View.OnLongClickListener() {
-					@Override
-					public boolean onLongClick(View view) {
-						editAdherence(medication, dateKey, index);
-						return false;
-					}
-				});
-				adherenceViews[index].setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						if (adherence[index].getAdherenceType() == Adherence.AdherenceType.TAKEN_CLARIFY_TIME) {
-							setTimeTaken(medication, dateKey, index);
-						}
-					}
-				});
+				// TODO : Swiping on details doesn't work as expected (only works for adherence view):
+//				motionEventListener.setOnSwipeListener(adherenceViews[index], onDetailsSwiped);
+				adherenceViews[index].setOnLongClickListener(view -> {
+                    editAdherence(medication, dateKey, index);
+                    return false;
+                });
+				adherenceViews[index].setOnClickListener(view -> {
+                    if (adherence[index].getAdherenceType() == Adherence.AdherenceType.TAKEN_CLARIFY_TIME) {
+                        setTimeTaken(medication, dateKey, index);
+                    }
+                });
 				adherenceViews[index].setBackground(Utils.getDrawableForAdherence(this, adherence[index].getAdherenceType()));
 				TextView timeTaken = (TextView) details.findViewById(timeTakenIDs[index]);
 				TextView imgMedication = (TextView) details.findViewById(medicationImgIDs[index]);
