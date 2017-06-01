@@ -152,7 +152,6 @@ public class Utils {
      * @param context The context used to save the adherence data to disk.
      */
     public static void setDummyAdherenceData(Context context){
-        Calendar today = Calendar.getInstance();
         ArrayList<Medication> medications = new ArrayList<>();
         Map<Calendar, Map<Medication, Adherence[]>> adherenceData = new TreeMap<>();
         Map<Medication, Integer> dosageMapping = new HashMap<>(); // in mg
@@ -216,7 +215,13 @@ public class Utils {
 
         //------------- ADD ADHERENCE DATA -----------------
 
-        for (int day = 1; day < today.get(Calendar.DATE); day++){
+        Calendar startDate = Calendar.getInstance();
+        startDate.set(Calendar.MONTH, Calendar.APRIL);
+        startDate.set(Calendar.DATE, 26);
+        Calendar endDate = Calendar.getInstance();
+        endDate.set(Calendar.MONTH, Calendar.AUGUST);
+        endDate.set(Calendar.DATE, 15);
+        while (startDate.before(endDate)){
             Map<Medication, Adherence[]> singleDayAdherenceData = new HashMap<>();
             for (Medication medication : medications){
                 Adherence[] medicationAdherence = new Adherence[2];
@@ -230,44 +235,11 @@ public class Utils {
                 }
                 singleDayAdherenceData.put(medication, medicationAdherence);
             }
-            adherenceData.put(Utils.getDateKey(2017, 4, day), singleDayAdherenceData);
+            adherenceData.put(Utils.getDateKey(startDate), singleDayAdherenceData);
+            startDate.add(Calendar.DATE, 1);
         }
 
-        for (int day = today.get(Calendar.DATE); day <= today.getActualMaximum(Calendar.DAY_OF_MONTH); day++){
-            Map<Medication, Adherence[]> singleDayAdherenceData = new HashMap<>();
-            for (Medication medication : medications){
-                Adherence[] medicationAdherence = new Adherence[2];
-                for (int j = 0; j < medicationAdherence.length; j++){
-                    if (dailySchedule.get(medication)[j] == null)
-                        medicationAdherence[j] = new Adherence(Adherence.AdherenceType.NONE, null);
-                    else {
-                        medicationAdherence[j] = new Adherence(Adherence.AdherenceType.FUTURE, null);
-                    }
-                }
-                singleDayAdherenceData.put(medication, medicationAdherence);
-            }
-            adherenceData.put(Utils.getDateKey(2017, 4, day), singleDayAdherenceData);
-        }
-
-        //prev month as well:
-        Calendar currentDate = Calendar.getInstance();
-        currentDate.set(Calendar.MONTH, 3);
-        for (int day = 24; day <= currentDate.getActualMaximum(Calendar.DAY_OF_MONTH); day++) {
-            Map<Medication, Adherence[]> singleDayAdherenceData = new HashMap<>();
-            for (Medication medication : medications) {
-                Adherence[] medicationAdherence = new Adherence[2];
-                for (int j = 0; j < medicationAdherence.length; j++) {
-                    if (dailySchedule.get(medication)[j] == null)
-                        medicationAdherence[j] = new Adherence(Adherence.AdherenceType.NONE, null);
-                    else {
-                        Calendar timeTaken = (Calendar) dailySchedule.get(medication)[j].clone();
-                        medicationAdherence[j] = new Adherence(Adherence.AdherenceType.TAKEN, timeTaken);
-                    }
-                }
-                singleDayAdherenceData.put(medication, medicationAdherence);
-            }
-            adherenceData.put(Utils.getDateKey(2017, 3, day), singleDayAdherenceData);
-        }
+        //------------------- SAVE TO DISK --------------------
 
         ApplicationPreferences preferences = ApplicationPreferences.getInstance(context);
         preferences.setAdherenceData(adherenceData);
