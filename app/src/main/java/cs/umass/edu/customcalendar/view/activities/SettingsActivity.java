@@ -1,14 +1,18 @@
 package cs.umass.edu.customcalendar.view.activities;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.NumberPicker;
@@ -16,18 +20,20 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Map;
 
-import cs.umass.edu.customcalendar.io.ApplicationPreferences;
+import cs.umass.edu.customcalendar.R;
 import cs.umass.edu.customcalendar.constants.Constants;
 import cs.umass.edu.customcalendar.data.Medication;
-import cs.umass.edu.customcalendar.view.custom.MedicationArrayAdapter;
-import cs.umass.edu.customcalendar.R;
+import cs.umass.edu.customcalendar.io.ApplicationPreferences;
 import cs.umass.edu.customcalendar.util.Utils;
+import cs.umass.edu.customcalendar.view.custom.MedicationArrayAdapter;
 
 /**
  * This activity allows the user to adjust medication reminder times and
@@ -140,82 +146,75 @@ public class SettingsActivity extends BaseActivity {
 //        dosagePicker.invalidate();
 
         Button cancelButton = (Button) dialog.findViewById(R.id.btn_cancel);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
 
         Button saveButton = (Button) dialog.findViewById(R.id.btn_save);
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String dosageStr = minuteValues[dosagePicker.getValue()];
-                int dosage = Integer.parseInt(dosageStr.split(" ")[0]);
-                dosageMapping.put(medication, dosage);
+        saveButton.setOnClickListener(v -> {
+            String dosageStr = minuteValues[dosagePicker.getValue()];
+            int dosage = Integer.parseInt(dosageStr.split(" ")[0]);
+            dosageMapping.put(medication, dosage);
 
-                Calendar timeAM = Utils.getTime(timePickerAM);
-                Calendar timePM = Utils.getTime(timePickerPM);
+            Calendar timeAM = Utils.getTime(timePickerAM);
+            Calendar timePM = Utils.getTime(timePickerPM);
 
-                Calendar[] schedule = dailySchedule.get(medication);
-                if (schedule[0] != null) {
-                    schedule[0] = timeAM;
-                    schedule[0].set(Calendar.AM_PM, Calendar.AM);
-                }
-                if (schedule[1] != null) {
-                    schedule[1] = timePM;
-                    schedule[1].set(Calendar.AM_PM, Calendar.PM);
-                }
-
-                if (medicationImage != null)
-                    medication.setImage(medicationImage);
-
-                dialog.dismiss();
-                medicationAdapter.notifyDataSetChanged();
-
-                // persist to disk
-                ApplicationPreferences preferences = ApplicationPreferences.getInstance(SettingsActivity.this);
-                preferences.setMedications(medications);
-                preferences.setDosageMapping(dosageMapping);
-                preferences.setDailySchedule(dailySchedule);
-                preferences.scheduleReminders();
+            Calendar[] schedule1 = dailySchedule.get(medication);
+            if (schedule1[0] != null) {
+                schedule1[0] = timeAM;
+                schedule1[0].set(Calendar.AM_PM, Calendar.AM);
             }
+            if (schedule1[1] != null) {
+                schedule1[1] = timePM;
+                schedule1[1].set(Calendar.AM_PM, Calendar.PM);
+            }
+
+            if (medicationImage != null)
+                medication.setImage(medicationImage);
+
+            dialog.dismiss();
+            medicationAdapter.notifyDataSetChanged();
+
+            // persist to disk
+            ApplicationPreferences preferences = ApplicationPreferences.getInstance(SettingsActivity.this);
+            preferences.setMedications(medications);
+            preferences.setDosageMapping(dosageMapping);
+            preferences.setDailySchedule(dailySchedule);
+            preferences.scheduleReminders();
         });
 
         TextView takePhoto = (TextView) dialog.findViewById(R.id.take_photo);
-        takePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                medicationImage = null; // reset
-                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, CAMERA_REQUEST);
-            }
+        takePhoto.setOnClickListener(view -> {
+            medicationImage = null; // reset
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, CAMERA_REQUEST);
         });
 
         TextView chooseFromGallery = (TextView) dialog.findViewById(R.id.choose_from_gallery);
-        chooseFromGallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                medicationImage = null; // reset
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_REQUEST);
-            }
+        chooseFromGallery.setOnClickListener(view -> {
+            medicationImage = null; // reset
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_REQUEST);
         });
 
         TextView refreshImage = (TextView) dialog.findViewById(R.id.default_medication_icon);
-        refreshImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                medicationImage = medication.getDefaultImage();
-                BitmapDrawable medicationDrawable = new BitmapDrawable(getResources(), medicationImage);
-                imgMedication.setCompoundDrawablesWithIntrinsicBounds(null, medicationDrawable, null, null);
-            }
+        refreshImage.setOnClickListener(view -> {
+            medicationImage = medication.getDefaultImage();
+            BitmapDrawable medicationDrawable1 = new BitmapDrawable(getResources(), medicationImage);
+            imgMedication.setCompoundDrawablesWithIntrinsicBounds(null, medicationDrawable1, null, null);
         });
 
         dialog.show();
+    }
+
+    private Bitmap getBitmapFromUri(Uri uri) throws IOException {
+        ParcelFileDescriptor parcelFileDescriptor =
+                getContentResolver().openFileDescriptor(uri, "r");
+        if (parcelFileDescriptor == null) return null;
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+        parcelFileDescriptor.close();
+        return image;
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -224,9 +223,19 @@ public class SettingsActivity extends BaseActivity {
             BitmapDrawable medicationDrawable = new BitmapDrawable(getResources(), medicationImage);
             imgMedication.setCompoundDrawablesWithIntrinsicBounds(null, medicationDrawable, null, null);
         } else if (requestCode == IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
-            medicationImage = (Bitmap) data.getExtras().get("data");
-            BitmapDrawable medicationDrawable = new BitmapDrawable(getResources(), medicationImage);
-            imgMedication.setCompoundDrawablesWithIntrinsicBounds(null, medicationDrawable, null, null);
+            Uri selectedImageUri = data.getData();
+            ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            int iconSize = am.getLauncherLargeIconSize();
+            try {
+                Bitmap selectedImage = getBitmapFromUri(selectedImageUri);
+                // resize to size of icon:
+                medicationImage = Bitmap.createScaledBitmap(selectedImage, iconSize, iconSize, true);
+
+                BitmapDrawable medicationDrawable = new BitmapDrawable(getResources(), medicationImage);
+                imgMedication.setCompoundDrawablesWithIntrinsicBounds(null, medicationDrawable, null, null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -249,12 +258,7 @@ public class SettingsActivity extends BaseActivity {
         loadData();
 
         Button cancelButton = (Button) findViewById(R.id.btn_cancel_settings);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        cancelButton.setOnClickListener(view -> finish());
 
         if (medications == null){
             Toast.makeText(this, "No medications found. Please contact your primary care provider.", Toast.LENGTH_SHORT).show();
@@ -264,21 +268,15 @@ public class SettingsActivity extends BaseActivity {
         ListView medicationsList = (ListView) findViewById(R.id.lvMedications);
         medicationsList.setAdapter(medicationAdapter);
         medicationAdapter.notifyDataSetChanged();
-        medicationsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,long arg3) {
-                selectedPosition = position;
-                view.setSelected(true);
-            }
+        medicationsList.setOnItemClickListener((parent, view, position, arg3) -> {
+            selectedPosition = position;
+            view.setSelected(true);
         });
 
         Button adjustButton = (Button) findViewById(R.id.btn_adjust);
-        adjustButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (selectedPosition >= 0) {
-                    showMedicationAdjustmentDialog();
-                }
+        adjustButton.setOnClickListener(view -> {
+            if (selectedPosition >= 0) {
+                showMedicationAdjustmentDialog();
             }
         });
     }
