@@ -2,6 +2,8 @@
 <resources>
     <string name="app_name">PrEPare</string>
 
+    <string name="title_select_device">Select Pill Bottle</string>
+
     <string name="button_label_save">Save</string>
     <string name="button_label_cancel">Cancel</string>
     <string name="button_label_adjust">Adjust</string>
@@ -28,4 +30,5 @@
 
     <string name="menu_item_title_chart">Chart My Progress</string>
     <string name="menu_item_title_settings">Settings</string>
+
 </resources>

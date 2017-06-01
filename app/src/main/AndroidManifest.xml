@@ -8,6 +8,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <!-- TODO : Do we want fullBackupContent? Or should the application just request data from the server? -->
     <application
@@ -37,6 +38,8 @@
         <activity
             android:name=".view.activities.ProgressActivity"
             android:theme="@style/MyTheme" />
+
+        <activity android:name=".view.activities.SelectDeviceActivity"/>
 
         <receiver android:name=".reminders.NotificationPublisher"/>
 
