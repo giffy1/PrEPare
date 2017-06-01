@@ -34,8 +34,8 @@ import edu.umass.cs.MHLClient.client.MobileIOClient;
  */
 public abstract class SensorService extends Service implements ConnectionStateHandler {
 
-    @SuppressWarnings("unused")
     /** used for debugging purposes */
+    @SuppressWarnings("unused")
     protected static final String TAG = SensorService.class.getName();
 
     /** Responsible for communicating with the data collection server. */
@@ -118,7 +118,7 @@ public abstract class SensorService extends Service implements ConnectionStateHa
      */
     protected void start(){
         Log.d(TAG, "Service started");
-        //connectToServer();
+        connectToServer();
         registerSensors();
     }
 
