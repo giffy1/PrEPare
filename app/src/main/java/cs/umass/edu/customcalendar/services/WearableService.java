@@ -2,7 +2,9 @@ package cs.umass.edu.customcalendar.services;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.microsoft.band.BandClient;
@@ -68,32 +70,32 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
         protected Void doInBackground(Void... params) {
             try {
                 if (getConnectedBandClient()) {
-//                    broadcastStatus(getString(R.string.status_connected)); // TODO
+                    broadcastStatus(getString(R.string.status_connected));
                     broadcastMessage(Constants.MESSAGES.WEARABLE_CONNECTED);
                     bandClient.getSensorManager().registerGyroscopeEventListener(WearableService.this, SampleRate.MS16);
                     onServiceStarted();
                 } else {
                     broadcastMessage(Constants.MESSAGES.WEARABLE_CONNECTION_FAILED);
-//                    broadcastStatus(getString(R.string.status_not_connected)); // TODO
+                    broadcastStatus(getString(R.string.status_not_connected));
                 }
             } catch (BandException e) {
-                String exceptionMessage = "An Exception occurred"; // TODO
+                String exceptionMessage;
                 switch (e.getErrorType()) {
                     case UNSUPPORTED_SDK_VERSION_ERROR:
-//                        exceptionMessage = getString(R.string.err_unsupported_sdk_version);
+                        exceptionMessage = getString(R.string.err_unsupported_sdk_version);
                         break;
                     case SERVICE_ERROR:
-//                        exceptionMessage = getString(R.string.err_service);
+                        exceptionMessage = getString(R.string.err_service);
                         break;
                     default:
-//                        exceptionMessage = getString(R.string.err_default) + e.getMessage();
+                        exceptionMessage = getString(R.string.err_default) + e.getMessage();
                         break;
                 }
                 Log.e(TAG, exceptionMessage);
                 broadcastStatus(exceptionMessage);
                 broadcastMessage(Constants.MESSAGES.WEARABLE_CONNECTION_FAILED);
             } catch (Exception e) {
-//                broadcastStatus(getString(R.string.err_default) + e.getMessage()); // TODO
+                broadcastStatus(getString(R.string.err_default) + e.getMessage());
                 broadcastMessage(Constants.MESSAGES.WEARABLE_CONNECTION_FAILED);
             }
             return null;
@@ -110,7 +112,7 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
         if (bandClient == null) {
             BandInfo[] devices = BandClientManager.getInstance().getPairedBands();
             if (devices.length == 0) {
-//                broadcastStatus(getString(R.string.status_not_paired)); // TODO
+                broadcastStatus(getString(R.string.status_not_paired));
                 return false;
             }
             bandClient = BandClientManager.getInstance().create(getBaseContext(), devices[0]);
@@ -118,7 +120,7 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
             return true;
         }
 
-//        broadcastStatus(getString(R.string.status_connecting)); // TODO
+        broadcastStatus(getString(R.string.status_connecting));
         return ConnectionState.CONNECTED == bandClient.connect().await();
     }
 
@@ -137,7 +139,7 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
                 bandClient.getSensorManager().unregisterAllListeners();
                 disconnectBand();
             } catch (BandIOException e) {
-//                broadcastStatus(getString(R.string.err_default) + e.getMessage()); // TODO
+                broadcastStatus(getString(R.string.err_default) + e.getMessage());
             }
         }
     }
@@ -149,7 +151,7 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
 
     @Override
     protected String getNotificationContentText() {
-        return "NOTIFICATION "; // TODO: // getString(R.string.wearable_service_notification);
+        return "NOTIFICATION"; // TODO: // getString(R.string.wearable_service_notification);
     }
 
     @Override
@@ -171,7 +173,7 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
     }
 
     private void broadcastStatus(String status){
-        //TODO
+        // TODO
         Log.i(TAG, status);
     }
 
