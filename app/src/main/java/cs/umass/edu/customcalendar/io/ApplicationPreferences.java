@@ -29,16 +29,19 @@ import cs.umass.edu.customcalendar.reminders.NotificationPublisher;
 public class ApplicationPreferences {
 
     /** The list of medications. **/
-    private ArrayList<Medication> medications = new ArrayList<>();
+    private ArrayList<Medication> medications;
 
     /** The entire adherence data. Date is stored in a tree map because dates are naturally ordered. **/
-    private Map<Calendar, Map<Medication, Adherence[]>> adherenceData = new TreeMap<>();
+    private Map<Calendar, Map<Medication, Adherence[]>> adherenceData;
 
     /** Maps a medication to a dosage **/
-    private Map<Medication, Integer> dosageMapping = new HashMap<>(); // in mg
+    private Map<Medication, Integer> dosageMapping; // in mg
 
     /** Maps a medication to a schedule (a list of times to take the medication). **/
-    private Map<Medication, Calendar[]> dailySchedule = new HashMap<>();
+    private Map<Medication, Calendar[]> dailySchedule;
+
+    /** Maps a medication to a unique Mac Address. **/
+    private Map<Medication, String> addressMapping;
 
     private static ApplicationPreferences instance;
 
@@ -56,6 +59,7 @@ public class ApplicationPreferences {
         adherenceData = new TreeMap<>();
         dosageMapping = new HashMap<>();
         dailySchedule = new HashMap<>();
+        addressMapping = new HashMap<>();
 
         loadPreferences();
     }
@@ -66,6 +70,7 @@ public class ApplicationPreferences {
         dosageMapping = (Map<Medication, Integer>) readObject("dosage_mapping");
         dailySchedule = (Map<Medication, Calendar[]>) readObject("daily_schedule");
         adherenceData = (Map<Calendar, Map<Medication, Adherence[]>>) readObject("adherence_data");
+        addressMapping = (Map<Medication, String>) readObject("address_mapping");
     }
 
     private Object readObject(String filename) {
@@ -113,6 +118,11 @@ public class ApplicationPreferences {
         writeObject(dosageMapping, "dosage_mapping");
     }
 
+    public void setAddressMapping(Map<Medication, String> addressMapping){
+        this.addressMapping = addressMapping;
+        writeObject(addressMapping, "address_mapping");
+    }
+
     public ArrayList<Medication> getMedications(){
         return medications;
     }
@@ -127,6 +137,10 @@ public class ApplicationPreferences {
 
     public Map<Medication, Integer> getDosageMapping(){
         return dosageMapping;
+    }
+
+    public Map<Medication, String> getAddressMapping() {
+        return addressMapping;
     }
 
     /**
