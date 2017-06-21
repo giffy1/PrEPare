@@ -1,6 +1,7 @@
 package cs.umass.edu.prepare.io;
 
 import android.content.Context;
+import android.os.AsyncTask;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -92,30 +93,53 @@ public class ApplicationPreferences {
     }
 
     /**
+     * An asynchronous task for writing data to disk.
+     */
+    private class WriteOperation extends AsyncTask<Object, Void, Void> {
+
+        private final Context context;
+
+        WriteOperation(Context context){
+            super();
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Object... params) {
+            Object object = params[0];
+            String filename = (String) params[1];
+
+            File file = new File(context.getDir("data", Context.MODE_PRIVATE), filename);
+            try {
+                ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
+                outputStream.writeObject(object);
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {}
+
+        @Override
+        protected void onPreExecute() {}
+
+        @Override
+        protected void onProgressUpdate(Void... values) {}
+    }
+
+    /**
      * Writes an object to disk in a background thread.
      * @param context a context required to access storage.
      * @param object the data to write to disk.
      * @param filename the file to which to write the data.
      */
     private void writeObject(Context context, Object object, String filename){
+        new WriteOperation(context).doInBackground(object, filename);
         this.onDataChangedListeners.forEach(OnDataChangedListener::onDataChanged);
-
-        File file = new File(context.getDir("data", Context.MODE_PRIVATE), filename);
-        try {
-            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-            outputStream.writeObject(object);
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-//        Runnable r = () -> {
-//
-//        };
-//
-//        Thread t = new Thread(r); // save to disk on background thread
-//        t.start();
     }
 
     public void setMedications(Context context, ArrayList<Medication> medications){
