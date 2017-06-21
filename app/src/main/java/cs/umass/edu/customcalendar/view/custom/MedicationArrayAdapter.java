@@ -2,6 +2,7 @@ package cs.umass.edu.customcalendar.view.custom;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,9 +84,11 @@ public class MedicationArrayAdapter extends BaseAdapter {
         holder.txtDosage.setCompoundDrawablesWithIntrinsicBounds(null, medicationDrawable, null, null);
         holder.txtDosage.setText(String.format(Locale.getDefault(), "%d mg", dosageMapping.get(medications.get(position))));
         String output = "";
-        for (Calendar time : dailySchedule.get(medications.get(position))){
-            if (time != null) {
-                output += dateFormat.format(time.getTime()) + "\n";
+        if (dailySchedule.containsKey(medications.get(position))) {
+            for (Calendar time : dailySchedule.get(medications.get(position))) {
+                if (time != null) {
+                    output += dateFormat.format(time.getTime()) + "\n";
+                }
             }
         }
         holder.txtSchedule.setText(output);
