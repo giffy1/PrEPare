@@ -34,7 +34,6 @@
     <string name="menu_item_title_reminders">Set Reminders</string>
 
     <string name="notification_reminder_title" formatted="false">%1$s Reminder</string>
-    <string name="notification_reminder_text" formatted="false">Don\'t forget your %1$s (%2$d mg)</string>
 
     <string name="notification_gesture_detected_title">Detected Pill Taken!</string>
     <string name="notification_gesture_detected_text" formatted="false">We detected that you took a dose of %1$s at %2$s. Is this true?</string>
