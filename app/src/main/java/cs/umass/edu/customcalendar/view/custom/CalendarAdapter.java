@@ -73,7 +73,8 @@ public class CalendarAdapter extends BaseAdapter {
         this.data = data;
     }
 
-    public void setStyleBasics(boolean styleBasic){
+    // TODO: explain clearly styleBasic
+    public void setStyleBasic(boolean styleBasic){
         this.styleBasic = styleBasic;
     }
 
@@ -147,7 +148,6 @@ public class CalendarAdapter extends BaseAdapter {
 
         if (!date.equals("") && medications != null) {
             Calendar dateKey = Utils.getDateKey(month.get(Calendar.YEAR), month.get(Calendar.MONTH), Integer.parseInt(date));
-            Log.i("DATEKEY", dateKey.toString());
             if (data.containsKey(dateKey)) {
                 Map<Medication, Adherence[]> adherenceMap = data.get(dateKey);
                 for (Medication medication : medications) {
