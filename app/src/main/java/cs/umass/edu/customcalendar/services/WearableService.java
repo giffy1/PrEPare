@@ -154,7 +154,7 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
     /**
      * disconnects the sensor service from the Microsoft Band
      */
-    public void disconnectBand() {
+    private void disconnectBand() {
         if (bandClient != null) {
             try {
                 bandClient.disconnect().await();
