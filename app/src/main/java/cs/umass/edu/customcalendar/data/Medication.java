@@ -41,10 +41,14 @@ public class Medication implements Serializable {
     }
 
     public Bitmap getImage(){
+        if (image == null)
+            return null;
         return image.getBitmap();
     }
 
     public Bitmap getDefaultImage() {
+        if (defaultImage == null)
+            return null;
         return defaultImage.getBitmap();
     }
 
