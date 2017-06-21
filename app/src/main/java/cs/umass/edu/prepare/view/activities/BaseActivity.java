@@ -27,7 +27,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setDisplayShowCustomEnabled(true);
+            // TODO comment these out to show the back button in the action bar. Not sure how to make it white.
+//            actionBar.setHomeButtonEnabled(true);
+//            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
@@ -41,7 +43,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
+            case android.R.id.home:
+                finish();
+                return true;
             case R.id.action_chart:
                 Intent progressIntent = new Intent(this, ProgressActivity.class);
                 finish();
