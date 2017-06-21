@@ -13,16 +13,12 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mbientlab.bletoolbox.scanner.BleScannerFragment.ScannerCommunicationBus;
 import com.mbientlab.bletoolbox.scanner.ScannedDeviceInfo;
-import com.mbientlab.bletoolbox.scanner.ScannedDeviceInfoAdapter;
-import com.mbientlab.metawear.CodeBlock;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.Route;
 import com.mbientlab.metawear.android.BtleService;
@@ -75,13 +71,9 @@ public class SelectDeviceActivity extends AppCompatActivity implements ScannerCo
 
     private MetaWearBoard mwBoard;
 
-    private IBeacon iBeaconModule;
-
     private Led ledModule;
 
     private ListView lstDevices;
-
-    private Timer timer;
 
     private Map<Medication, String> addressMapping = new HashMap<>();
 
@@ -213,8 +205,8 @@ public class SelectDeviceActivity extends AppCompatActivity implements ScannerCo
     private void startMotionDetection(){
         ledModule = mwBoard.getModule(Led.class);
         motionModule = mwBoard.getModule(AccelerometerBosch.class); // TODO is this correct sensor?
-        timer = mwBoard.getModule(Timer.class);
-        iBeaconModule = mwBoard.getModule(IBeacon.class);
+        Timer timer = mwBoard.getModule(Timer.class);
+        IBeacon iBeaconModule = mwBoard.getModule(IBeacon.class);
 
 //        timer.scheduleAsync(30000, false, () -> iBeaconModule.configure().major((short) 0));
         timer.scheduleAsync(5000, false, () -> ledModule.stop(false));
