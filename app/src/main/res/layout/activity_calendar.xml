@@ -121,7 +121,6 @@
 			android:overScrollMode="never">
 			<LinearLayout
 				android:id="@+id/details"
-				android:background="@color/ap_gray"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:orientation="vertical"/>
