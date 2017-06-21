@@ -33,11 +33,11 @@
     <string name="menu_item_title_settings">Settings</string>
     <string name="menu_item_title_reminders">Set Reminders</string>
 
-    <string name="notification_reminder_title" formatted="false">%s Reminder</string>
-    <string name="notification_reminder_text" formatted="false">Don\'t forget your %s (%d mg)</string>
+    <string name="notification_reminder_title" formatted="false">%1$s Reminder</string>
+    <string name="notification_reminder_text" formatted="false">Don\'t forget your %1$s (%2$d mg)</string>
 
     <string name="notification_gesture_detected_title">Detected Pill Taken!</string>
-    <string name="notification_gesture_detected_text" formatted="false">We detected that you took a dose of %s at %s. Is this true?</string>
+    <string name="notification_gesture_detected_text" formatted="false">We detected that you took a dose of %1$s at %2$s. Is this true?</string>
 
     <string name="url_mobile_apk_shortened">https://goo.gl/CXRWRj</string>
     <string name="url_mobile_apk"><![CDATA[https://drive.google.com/uc?export=view&id=0Byr6oHEGQO73VGl0c2tnYmttU0k]]></string>
@@ -55,6 +55,8 @@
         <item>Sound</item>
     </string-array>
 
-    <string name="default_notification_text" formatted="false">Don\'t forget your %s (%d mg)</string>
+    <string name="default_notification_text" formatted="false">Don\'t forget your %1$s (%2$d mg)</string>
+    <string name="adherence_text_missed">Missed!</string>
+    <string name="adherence_text_unknown">Unknown</string>
     <integer name="pref_volume_index_default">1</integer>
 </resources>
