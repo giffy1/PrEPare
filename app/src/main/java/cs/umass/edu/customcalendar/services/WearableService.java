@@ -2,9 +2,7 @@ package cs.umass.edu.customcalendar.services;
 
 import android.app.Notification;
 import android.app.Service;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.microsoft.band.BandClient;
@@ -13,13 +11,17 @@ import com.microsoft.band.BandException;
 import com.microsoft.band.BandIOException;
 import com.microsoft.band.BandInfo;
 import com.microsoft.band.ConnectionState;
+import com.microsoft.band.notifications.VibrationType;
 import com.microsoft.band.sensors.BandAccelerometerEventListener;
 import com.microsoft.band.sensors.BandGyroscopeEvent;
 import com.microsoft.band.sensors.BandGyroscopeEventListener;
 import com.microsoft.band.sensors.SampleRate;
 
-import cs.umass.edu.customcalendar.constants.Constants;
+import java.util.UUID;
+
 import cs.umass.edu.customcalendar.R;
+import cs.umass.edu.customcalendar.constants.Constants;
+import cs.umass.edu.customcalendar.data.Medication;
 import edu.umass.cs.MHLClient.sensors.AccelerometerReading;
 import edu.umass.cs.MHLClient.sensors.GyroscopeReading;
 
@@ -45,16 +47,6 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
     /** The object which receives sensor data from the Microsoft Band */
     private BandClient bandClient = null;
 
-    @Override
-    protected void onServiceStarted() {
-        broadcastMessage(Constants.MESSAGES.WEARABLE_SERVICE_STARTED);
-    }
-
-    @Override
-    protected void onServiceStopped() {
-        broadcastMessage(Constants.MESSAGES.WEARABLE_SERVICE_STOPPED);
-    }
-
     /**
      * Asynchronous task for connecting to the Microsoft Band accelerometer and gyroscope sensors.
      * Errors may arise if the Band does not support the Band SDK version or the Microsoft Health
@@ -73,7 +65,7 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
                     broadcastStatus(getString(R.string.status_connected));
                     broadcastMessage(Constants.MESSAGES.WEARABLE_CONNECTED);
                     bandClient.getSensorManager().registerGyroscopeEventListener(WearableService.this, SampleRate.MS16);
-                    onServiceStarted();
+                    onSensorStarted();
                 } else {
                     broadcastMessage(Constants.MESSAGES.WEARABLE_CONNECTION_FAILED);
                     broadcastStatus(getString(R.string.status_not_connected));
@@ -179,15 +171,12 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
 
     @Override
     public void onBandGyroscopeChanged(BandGyroscopeEvent event) {
-
         float accelerometerX = event.getAccelerationX();
         float accelerometerY = event.getAccelerationY();
         float accelerometerZ = event.getAccelerationZ();
         float gyroscopeX = event.getAngularVelocityX();
         float gyroscopeY = event.getAngularVelocityY();
         float gyroscopeZ = event.getAngularVelocityZ();
-
-        Log.d(TAG, "Sending data to server...");
 
         long timestamp = System.currentTimeMillis(); //event.getTimestamp();
 
@@ -205,5 +194,17 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
 //        broadcaster.broadcastSensorReading(Constants.SENSOR_TYPE.GYROSCOPE_WEARABLE, timestamp,
 //                gyroscopeX, gyroscopeY, gyroscopeZ);
 
+    }
+
+    // TODO : call when pill intake gesture detected (happens in DataService, must notify this service from there).
+    public void sendNotificationToWearable(Medication medication){
+        try {
+            // send a dialog to the Band for one of our tiles
+            bandClient.getNotificationManager().vibrate(VibrationType.NOTIFICATION_ALARM);
+            bandClient.getNotificationManager().showDialog(UUID.randomUUID(),
+                    "You've taken a dose of " + medication.getName(), "If this is incorrect, please correct it on your phone.").await();
+        } catch (BandException | InterruptedException e) {
+            // handle BandException
+        }
     }
 }
