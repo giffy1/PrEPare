@@ -71,6 +71,7 @@ public abstract class SensorService extends Service implements ConnectionStateHa
     /**
      * Called when the service has been stopped.
      */
+    @SuppressWarnings("EmptyMethod")
     protected void onServiceStopped(){
         // allow subclasses to execute additional logic after the service has been stopped
     }
@@ -78,6 +79,7 @@ public abstract class SensorService extends Service implements ConnectionStateHa
     /**
      * Called when the service has been started.
      */
+    @SuppressWarnings("EmptyMethod")
     protected void onServiceStarted(){
         // allow subclasses to execute additional logic after the service has been started
     }
@@ -85,6 +87,7 @@ public abstract class SensorService extends Service implements ConnectionStateHa
     /**
      * Called when the service has been stopped.
      */
+    @SuppressWarnings("EmptyMethod")
     protected void onSensorStopped(){
         // allow subclasses to execute additional logic after the service has been stopped
     }
@@ -94,6 +97,7 @@ public abstract class SensorService extends Service implements ConnectionStateHa
      * of {@link SensorService} may want to re-register the sensors and start the
      * service in the foreground again or stop the service if this occurs.
      */
+    @SuppressWarnings("EmptyMethod")
     protected void onServiceRestarted(){
         // allow subclasses to handle the case that the server has been restarted.
     }
