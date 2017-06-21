@@ -16,10 +16,10 @@ import java.util.Map;
 public class CustomMotionEventListener implements View.OnTouchListener {
 
     /** Maps each view to a swipe listener. **/
-    private Map<View, OnSwipeListener> viewOnSwipeListeners = new HashMap<>();
+    private final Map<View, OnSwipeListener> viewOnSwipeListeners = new HashMap<>();
 
     /** Maps each activity to a swipe listener. **/
-    private Map<Activity, OnSwipeListener> activityOnSwipeListeners = new HashMap<>();
+    private final Map<Activity, OnSwipeListener> activityOnSwipeListeners = new HashMap<>();
 
     /** The initial position of the swipe. **/
     private float x1;

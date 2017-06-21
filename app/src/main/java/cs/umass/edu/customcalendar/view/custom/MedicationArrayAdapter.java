@@ -58,7 +58,7 @@ public class MedicationArrayAdapter extends BaseAdapter {
         TextView txtSchedule, txtMedication, txtDosage;
     }
 
-    private View[] rowView;
+    private final View[] rowView;
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {

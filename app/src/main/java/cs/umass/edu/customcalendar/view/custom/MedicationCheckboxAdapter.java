@@ -52,14 +52,14 @@ public class MedicationCheckboxAdapter extends BaseAdapter {
         this.onCheckedChangeListener = onCheckedChangeListener;
     }
 
-    public class Holder
+    private class Holder
     {
         CheckBox chkMedication;
         ImageView imgMedication;
         TextView txtMedication;
     }
 
-    private View[] rowView;
+    private final View[] rowView;
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {

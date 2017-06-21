@@ -74,7 +74,7 @@ public class SelectDeviceActivity extends AppCompatActivity implements ScannerCo
 
     private ListView lstDevices;
 
-    private Map<Medication, String> addressMapping = new HashMap<>();
+    private final Map<Medication, String> addressMapping = new HashMap<>();
 
     static {
         serviceUUIDs = new UUID[] {

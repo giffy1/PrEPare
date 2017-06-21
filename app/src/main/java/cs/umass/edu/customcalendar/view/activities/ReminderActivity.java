@@ -88,7 +88,7 @@ public class ReminderActivity extends BaseActivity {
     private TreeSet<Integer> reminders = new TreeSet<>();
 
     /** The list of reminders shown to the user, e.g. "On time", "10 min. before". */
-    private ArrayList<String> reminderStrings = new ArrayList<>();
+    private final ArrayList<String> reminderStrings = new ArrayList<>();
 
     /** Populates the list view with the reminder strings. */
     private ArrayAdapter<String> adapter;
@@ -100,10 +100,10 @@ public class ReminderActivity extends BaseActivity {
     private static final int REMOVE_REMINDER = -1;
 
     /** Specific reminder options to choose from, not including "custom". */
-    private int[] options = {REMOVE_REMINDER, 0, 10, 30, 60};
+    private final int[] options = {REMOVE_REMINDER, 0, 10, 30, 60};
 
     /** Human-readable reminder options to choose from, including "custom". */
-    private String[] optionStrings = {"None", "On time", "10 min before", "30 min before", "1 hour before", "Custom"};
+    private final String[] optionStrings = {"None", "On time", "10 min before", "30 min before", "1 hour before", "Custom"};
 
     /**
      * Loads the set of reminders from disk.

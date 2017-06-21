@@ -22,7 +22,7 @@ import cs.umass.edu.customcalendar.util.Utils;
 
 public class CheckForUpdatesTask extends AsyncTask<Boolean, Void, String> {
 
-    private Context context;
+    private final Context context;
 
     private boolean onStart;
 

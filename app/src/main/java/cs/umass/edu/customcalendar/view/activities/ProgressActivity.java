@@ -59,9 +59,9 @@ public class ProgressActivity extends BaseActivity {
     /** A mapping from medications to boolean flags, indicating whether that medication is selected for display. **/
     private Map<Medication, Boolean> medicationCheckedMapping;
 
-    private SimpleDateFormat monthFormat = Constants.DATE_FORMAT.MMM_YY;
+    private final SimpleDateFormat monthFormat = Constants.DATE_FORMAT.MMM_YY;
 
-    private SimpleDateFormat weekFormat = Constants.DATE_FORMAT.MONTH_DAY;
+    private final SimpleDateFormat weekFormat = Constants.DATE_FORMAT.MONTH_DAY;
 
     /** Indicates whether aggregate data is displayed by month (true) or by week (false). */
     private boolean byMonth = true;

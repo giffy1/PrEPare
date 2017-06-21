@@ -91,5 +91,5 @@ public class Constants {
         int ENABLE_BLUETOOTH = 1;
     }
 
-    public static int MILLISECONDS_PER_DAY = 24*60*60*1000;
+    public static final int MILLISECONDS_PER_DAY = 24*60*60*1000;
 }

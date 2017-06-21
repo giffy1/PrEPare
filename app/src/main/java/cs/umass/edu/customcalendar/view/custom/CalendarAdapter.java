@@ -40,11 +40,11 @@ import cs.umass.edu.customcalendar.util.Utils;
 public class CalendarAdapter extends BaseAdapter {
 	private static final int FIRST_DAY_OF_WEEK = 0; // 0=Sunday, 1=Monday etc.
 	
-	private Context mContext;
+	private final Context mContext;
 
     private String[] days;
 
-    private Calendar month;
+    private final Calendar month;
     private Calendar selectedDate;
     private Map<Calendar, Map<Medication, Adherence[]>> data = new TreeMap<>();
     private ArrayList<Medication> medications;

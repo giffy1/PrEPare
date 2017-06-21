@@ -77,10 +77,10 @@ public class CalendarActivity extends AppCompatActivity {
 	private final Calendar today;
 
 	/** The activity_calendar's date, indicating the month and year being viewed. Day is irrelevant. **/
-	public Calendar month;
+	public final Calendar month;
 
 	/** The date the user selected, initially the current date. **/
-	private Calendar selectedDate;
+	private final Calendar selectedDate;
 
 	/** The adapter for displaying the custom activity_calendar. **/
 	public CalendarAdapter adapter;
@@ -134,7 +134,7 @@ public class CalendarActivity extends AppCompatActivity {
 		}
 	};
 
-	private CustomMotionEventListener motionEventListener = new CustomMotionEventListener();
+	private final CustomMotionEventListener motionEventListener = new CustomMotionEventListener();
 
 	public CalendarActivity(){
 		today = Calendar.getInstance();
@@ -561,7 +561,7 @@ public class CalendarActivity extends AppCompatActivity {
 	/**
 	 * Asynchronously updates the data displayed in the activity_calendar view.
 	 */
-	public Runnable calendarUpdater = new Runnable() {
+	public final Runnable calendarUpdater = new Runnable() {
 		@Override
 		public void run() {
 			adapter.setData(adherenceData);

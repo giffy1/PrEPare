@@ -46,7 +46,7 @@ public class ApplicationPreferences {
         void onDataChanged();
     }
 
-    private List<OnDataChangedListener> onDataChangedListeners = new ArrayList<>();
+    private final List<OnDataChangedListener> onDataChangedListeners = new ArrayList<>();
 
     public void addOnDataChangedListener(OnDataChangedListener onDataChangedListener){
         this.onDataChangedListeners.add(onDataChangedListener);

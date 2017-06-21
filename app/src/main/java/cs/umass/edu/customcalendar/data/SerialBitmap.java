@@ -10,11 +10,11 @@ import java.io.Serializable;
 /**
  * See https://stackoverflow.com/questions/6002800/android-serializable-problem.
  */
-public class SerialBitmap implements Serializable {
+class SerialBitmap implements Serializable {
 
     private Bitmap bitmap;
 
-    public SerialBitmap(Bitmap bitmap) {
+    SerialBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
     }
 
@@ -36,7 +36,7 @@ public class SerialBitmap implements Serializable {
         bitmap = BitmapFactory.decodeByteArray(bitmapBytes, 0, bitmapBytes.length);
     }
 
-    public Bitmap getBitmap() {
+    Bitmap getBitmap() {
         return bitmap;
     }
 }
