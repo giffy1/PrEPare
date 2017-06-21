@@ -61,9 +61,9 @@ public abstract class SensorService extends Service implements ConnectionStateHa
     }
 
     /**
-     * Called when the servie has been started.
+     * Called when the service has been started.
      */
-    protected void onServiceStarted(){
+    protected void onSensorStarted(){
         startForeground(getNotificationID(), getNotification());
         // allow subclasses to execute additional logic after the service has been started
     }
@@ -72,6 +72,20 @@ public abstract class SensorService extends Service implements ConnectionStateHa
      * Called when the service has been stopped.
      */
     protected void onServiceStopped(){
+        // allow subclasses to execute additional logic after the service has been stopped
+    }
+
+    /**
+     * Called when the service has been started.
+     */
+    protected void onServiceStarted(){
+        // allow subclasses to execute additional logic after the service has been started
+    }
+
+    /**
+     * Called when the service has been stopped.
+     */
+    protected void onSensorStopped(){
         // allow subclasses to execute additional logic after the service has been stopped
     }
 
@@ -120,6 +134,7 @@ public abstract class SensorService extends Service implements ConnectionStateHa
         Log.d(TAG, "Service started");
         connectToServer();
         registerSensors();
+        onServiceStarted();
     }
 
     /**
@@ -132,12 +147,13 @@ public abstract class SensorService extends Service implements ConnectionStateHa
 //            client.disconnect(); //TODO
         stopForeground(true);
         stopSelf();
+        onSensorStopped();
         onServiceStopped();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null){
+        if (intent != null && intent.getAction() != null){
             if (intent.getAction().equals(Constants.ACTION.START_SERVICE)) {
                 start();
             } else if (intent.getAction().equals(Constants.ACTION.STOP_SERVICE)) {
@@ -154,7 +170,7 @@ public abstract class SensorService extends Service implements ConnectionStateHa
      * Connects to the data collection server.
      */
     protected void connectToServer(){
-        mUserID = "91.e6.eb.8d.65.ee.a5.e3.5a.b3"; // TODO: // getString(R.string.mobile_health_client_user_id);
+        mUserID = getString(R.string.mobile_health_client_user_id);
         mClient = MobileIOClient.getInstance(this, mUserID);
         mClient.setConnectionStateHandler(this);
         mClient.connect();
