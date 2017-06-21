@@ -1,10 +1,6 @@
 package cs.umass.edu.customcalendar.io;
 
-import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,12 +11,14 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
-import cs.umass.edu.customcalendar.data.Medication;
 import cs.umass.edu.customcalendar.data.Adherence;
-import cs.umass.edu.customcalendar.reminders.NotificationPublisher;
+import cs.umass.edu.customcalendar.data.Medication;
 
 /**
  * A simplified preference manager which exposes the relevant variables
@@ -38,14 +36,24 @@ public class ApplicationPreferences {
     private Map<Medication, Integer> dosageMapping; // in mg
 
     /** Maps a medication to a schedule (a list of times to take the medication). **/
-    private Map<Medication, Calendar[]> dailySchedule;
+    private Map<Medication, Calendar[]> schedule;
 
     /** Maps a medication to a unique Mac Address. **/
     private Map<Medication, String> addressMapping;
 
+    private TreeSet<Integer> reminders;
+
     private static ApplicationPreferences instance;
 
-    private Context context;
+    public interface OnDataChangedListener {
+        void onDataChanged();
+    }
+
+    private List<OnDataChangedListener> onDataChangedListeners = new ArrayList<>();
+
+    public void addOnDataChangedListener(OnDataChangedListener onDataChangedListener){
+        this.onDataChangedListeners.add(onDataChangedListener);
+    }
 
     public static ApplicationPreferences getInstance(Context context){
         if (instance == null)
@@ -54,26 +62,26 @@ public class ApplicationPreferences {
     }
 
     private ApplicationPreferences(Context context){
-        this.context = context;
-        medications = new ArrayList<>();
-        adherenceData = new TreeMap<>();
-        dosageMapping = new HashMap<>();
-        dailySchedule = new HashMap<>();
-        addressMapping = new HashMap<>();
-
-        loadPreferences();
+        loadPreferences(context);
     }
 
     @SuppressWarnings("unchecked")
-    private void loadPreferences(){
-        medications = (ArrayList<Medication>) readObject("medications");
-        dosageMapping = (Map<Medication, Integer>) readObject("dosage_mapping");
-        dailySchedule = (Map<Medication, Calendar[]>) readObject("daily_schedule");
-        adherenceData = (Map<Calendar, Map<Medication, Adherence[]>>) readObject("adherence_data");
-        addressMapping = (Map<Medication, String>) readObject("address_mapping");
+    private void loadPreferences(Context context){
+        medications = (ArrayList<Medication>) readObject(context, "medications");
+        dosageMapping = (Map<Medication, Integer>) readObject(context, "dosage_mapping");
+        schedule = (Map<Medication, Calendar[]>) readObject(context, "daily_schedule");
+        adherenceData = (Map<Calendar, Map<Medication, Adherence[]>>) readObject(context, "adherence_data");
+        addressMapping = (Map<Medication, String>) readObject(context, "address_mapping");
+        reminders = (TreeSet<Integer>) readObject(context, "reminders");
     }
 
-    private Object readObject(String filename) {
+    /**
+     * Reads an object from disk. TODO : Should this be done on a background thread?
+     * @param context a context required to access storage.
+     * @param filename the file from which to read the data.
+     * @return an object containing the data read from the specified file.
+     */
+    private Object readObject(Context context, String filename) {
         Object object = null;
         File file = new File(context.getDir("data", Context.MODE_PRIVATE), filename);
         try {
@@ -86,126 +94,95 @@ public class ApplicationPreferences {
         return object;
     }
 
-    private void writeObject(Object object, String filename){
-        File file = new File(context.getDir("data", Context.MODE_PRIVATE), filename);
-        try {
-            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-            outputStream.writeObject(object);
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Writes an object to disk in a background thread.
+     * @param context a context required to access storage.
+     * @param object the data to write to disk.
+     * @param filename the file to which to write the data.
+     */
+    private void writeObject(Context context, Object object, String filename){
+        this.onDataChangedListeners.forEach(OnDataChangedListener::onDataChanged);
+
+        Runnable r = () -> {
+            File file = new File(context.getDir("data", Context.MODE_PRIVATE), filename);
+            try {
+                ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
+                outputStream.writeObject(object);
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+
+        Thread t = new Thread(r); // save to disk on background thread
+        t.start();
     }
 
-    public void setMedications(ArrayList<Medication> medications){
+    public void setMedications(Context context, ArrayList<Medication> medications){
         this.medications = medications;
-        writeObject(medications, "medications");
+        writeObject(context, medications, "medications");
     }
 
-    public void setAdherenceData(Map<Calendar, Map<Medication, Adherence[]>> adherenceData){
+    public void setAdherenceData(Context context, Map<Calendar, Map<Medication, Adherence[]>> adherenceData){
         this.adherenceData = adherenceData;
-        writeObject(adherenceData, "adherence_data");
+        writeObject(context, adherenceData, "adherence_data");
     }
 
-    public void setDailySchedule(Map<Medication, Calendar[]> dailySchedule){
-        this.dailySchedule = dailySchedule;
-        writeObject(dailySchedule, "daily_schedule");
+    public void setSchedule(Context context, Map<Medication, Calendar[]> schedule){
+        this.schedule = schedule;
+        writeObject(context, schedule, "daily_schedule");
     }
 
-    public void setDosageMapping(Map<Medication, Integer> dosageMapping){
+    public void setDosageMapping(Context context, Map<Medication, Integer> dosageMapping){
         this.dosageMapping = dosageMapping;
-        writeObject(dosageMapping, "dosage_mapping");
+        writeObject(context, dosageMapping, "dosage_mapping");
     }
 
-    public void setAddressMapping(Map<Medication, String> addressMapping){
+    public void setAddressMapping(Context context, Map<Medication, String> addressMapping){
         this.addressMapping = addressMapping;
-        writeObject(addressMapping, "address_mapping");
+        writeObject(context, addressMapping, "address_mapping");
     }
 
-    public ArrayList<Medication> getMedications(){
+    public void setReminders(Context context, TreeSet<Integer> reminders) {
+        this.reminders = reminders;
+        writeObject(context, reminders, "reminders");
+    }
+
+    public ArrayList<Medication> getMedications(Context context){
+        if (medications == null)
+            loadPreferences(context);
         return medications;
     }
 
-    public Map<Calendar, Map<Medication, Adherence[]>> getAdherenceData(){
+    public Map<Calendar, Map<Medication, Adherence[]>> getAdherenceData(Context context){
+        if (adherenceData == null)
+            loadPreferences(context);
         return adherenceData;
     }
 
-    public Map<Medication, Calendar[]> getDailySchedule(){
-        return dailySchedule;
+    public Map<Medication, Calendar[]> getSchedule(Context context){
+        if (schedule == null)
+            loadPreferences(context);
+        return schedule;
     }
 
-    public Map<Medication, Integer> getDosageMapping(){
+    public Map<Medication, Integer> getDosageMapping(Context context){
+        if (dosageMapping == null)
+            loadPreferences(context);
         return dosageMapping;
     }
 
-    public Map<Medication, String> getAddressMapping() {
+    public Map<Medication, String> getAddressMapping(Context context) {
+        if (addressMapping == null)
+            loadPreferences(context);
         return addressMapping;
     }
 
-    /**
-     * Schedules reminders for all medications.
-     *
-     * Note that when setting reminders using the {@link AlarmManager}, notifications are not
-     * delivered at the exact time, since the OS batches notifications for efficient delivery.
-     * See Asaf Gamliel's answer at https://stackoverflow.com/questions/27676553/android-alarm-manager-working-but-delayed
-     * for more details. To handle this, this method sets the reminder time to be 1 minute before the
-     * time selected by the user. Early delivers are acceptable (as are late within reason).
-     *
-     * Notification IDs for reminders start at 1001, so don't fire notifications with IDs in the range 1001-1010.
-     */
-    public void scheduleReminders(){
-        int notificationID = 1001;
-        for (Medication medication : medications){
-            Calendar[] schedule = dailySchedule.get(medication);
-            for (Calendar time : schedule){
-                if (time != null) {
-                    Calendar alarmTime = (Calendar) time.clone();
-                    alarmTime.add(Calendar.MINUTE, -1);
-                    if (alarmTime.before(Calendar.getInstance())) {
-                        alarmTime.add(Calendar.DATE, 1); // start tomorrow if the alarm should have happened already today
-                    }
-                    scheduleDailyNotification(getNotification(medication), notificationID++, alarmTime);
-                }
-            }
-        }
-    }
-
-    /**
-     * Schedules a notification to appear at a specific time each day.
-     * @param notification The notification to appear.
-     * @param notificationID The unique ID of the notification.
-     * @param alarmTime The time at which the notification should be fired.
-     */
-    private void scheduleDailyNotification(Notification notification, int notificationID, Calendar alarmTime) {
-        Intent notificationIntent = new Intent(context, NotificationPublisher.class);
-        notificationIntent.setAction("reminder");
-        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, notificationID);
-        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION, notification);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(pendingIntent);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), 24*60*60*1000, pendingIntent);
-    }
-
-    /**
-     * Creates a reminder according to a medication.
-     * @param medication The medication that must be taken.
-     * @return a {@link Notification} object.
-     */
-    private Notification getNotification(Medication medication) {
-        Notification.Builder builder = new Notification.Builder(context);
-        long[] pattern = {0, 600, 0};
-        builder.setVibrate(pattern);
-        // TODO: uncomment for sound, also let user customize
-//        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//        builder.setSound(alarmSound);
-        builder.setContentTitle("Take your pill!");
-        builder.setContentText(String.format("Don't forget to take your %s", medication.getName()));
-        builder.setLargeIcon(medication.getImage());
-        // builder.setSmallIcon(medication.getImage()); // TODO What about small icon? see https://stackoverflow.com/questions/23836920/how-to-set-bitmap-as-notification-icon-in-android
-        return builder.build();
+    public TreeSet<Integer> getReminders(Context context){
+        if (reminders == null)
+            loadPreferences(context);
+        return reminders;
     }
 
 }
