@@ -425,8 +425,8 @@ public class CalendarActivity extends AppCompatActivity {
 
 	/**
 	 * Allows the user to set time for adherence data where the time is unknown.
-	 * @param medication
-	 * @param index
+	 * @param medication the medication for which the adherence is being modified.
+	 * @param index the index of the adherence being modified, i.e. AM or PM.
 	 */
 	private void setTimeTaken(final Medication medication, final Calendar dateKey, final int index){
 		final Dialog dialog = new Dialog(this);
