@@ -15,7 +15,6 @@
         android:layout_height="wrap_content"/>
 
     <LinearLayout
-        android:id="@+id/dialog_time_button_layout"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent" >
         <Button
