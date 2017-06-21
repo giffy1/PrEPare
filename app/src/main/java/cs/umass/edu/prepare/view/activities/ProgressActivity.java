@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import cs.umass.edu.prepare.data.Adherence;
-import cs.umass.edu.prepare.io.ApplicationPreferences;
+import cs.umass.edu.prepare.io.DataIO;
 import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.data.Medication;
 import cs.umass.edu.prepare.view.custom.MedicationCheckboxAdapter;
@@ -133,7 +133,7 @@ public class ProgressActivity extends BaseActivity {
         plot.redraw();
 
         // populate data:
-        ApplicationPreferences preferences = ApplicationPreferences.getInstance (this);
+        DataIO preferences = DataIO.getInstance (this);
         medications = preferences.getMedications(this);
         adherenceData = preferences.getAdherenceData(this);
         medicationCheckedMapping = new HashMap<>();

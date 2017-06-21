@@ -38,7 +38,7 @@ import java.util.TreeSet;
 import cs.umass.edu.prepare.R;
 import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.data.Medication;
-import cs.umass.edu.prepare.io.ApplicationPreferences;
+import cs.umass.edu.prepare.io.DataIO;
 import cs.umass.edu.prepare.services.DataService;
 import cs.umass.edu.prepare.util.Utils;
 import cs.umass.edu.prepare.view.custom.MedicationArrayAdapter;
@@ -109,7 +109,7 @@ public class ReminderActivity extends BaseActivity {
      * Loads the set of reminders from disk.
      */
     private void loadData(){
-        ApplicationPreferences preferences = ApplicationPreferences.getInstance(this);
+        DataIO preferences = DataIO.getInstance(this);
         medications = preferences.getMedications(this);
         dosageMapping = preferences.getDosageMapping(this);
         dailySchedule = preferences.getSchedule(this);
@@ -197,7 +197,7 @@ public class ReminderActivity extends BaseActivity {
      * Saves the reminders to disk.
      */
     private void saveReminders(){
-        ApplicationPreferences preferences = ApplicationPreferences.getInstance(this);
+        DataIO preferences = DataIO.getInstance(this);
         preferences.setReminders(this, reminders);
     }
 
@@ -353,7 +353,7 @@ public class ReminderActivity extends BaseActivity {
             medicationAdapter.notifyDataSetChanged();
 
             // persist to disk
-            ApplicationPreferences preferences = ApplicationPreferences.getInstance(ReminderActivity.this);
+            DataIO preferences = DataIO.getInstance(ReminderActivity.this);
             preferences.setMedications(this, medications);
             preferences.setSchedule(this, dailySchedule);
 

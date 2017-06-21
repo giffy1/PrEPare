@@ -22,7 +22,7 @@ import cs.umass.edu.prepare.data.Medication;
  * A simplified preference manager which exposes the relevant variables
  * and updates the variables automatically when the preferences are changed.
  */
-public class ApplicationPreferences {
+public class DataIO {
 
     /** The list of medications. **/
     private ArrayList<Medication> medications;
@@ -41,7 +41,7 @@ public class ApplicationPreferences {
 
     private TreeSet<Integer> reminders;
 
-    private static ApplicationPreferences instance;
+    private static DataIO instance;
 
     public interface OnDataChangedListener {
         void onDataChanged();
@@ -53,13 +53,13 @@ public class ApplicationPreferences {
         this.onDataChangedListeners.add(onDataChangedListener);
     }
 
-    public static ApplicationPreferences getInstance(Context context){
+    public static DataIO getInstance(Context context){
         if (instance == null)
-            instance = new ApplicationPreferences(context);
+            instance = new DataIO(context);
         return instance;
     }
 
-    private ApplicationPreferences(Context context){
+    private DataIO(Context context){
         loadPreferences(context);
     }
 

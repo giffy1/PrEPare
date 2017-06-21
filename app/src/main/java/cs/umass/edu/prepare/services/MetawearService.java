@@ -63,8 +63,8 @@ public class MetawearService extends SensorService implements ServiceConnection 
     protected void registerSensors() {
         if (mIsBound) return;
         BluetoothManager btManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        List<Medication> medications = applicationPreferences.getMedications(this);
-        Map<Medication, String> addressMapping = applicationPreferences.getAddressMapping(this);
+        List<Medication> medications = dataIO.getMedications(this);
+        Map<Medication, String> addressMapping = dataIO.getAddressMapping(this);
 
         try {
             btDevice = btManager.getAdapter().getRemoteDevice(addressMapping.get(medications.get(0)));
@@ -201,7 +201,7 @@ public class MetawearService extends SensorService implements ServiceConnection 
         Accelerometer.ConfigEditor<?> accelEditor = accModule.configure();
         accelEditor.range(2.f);
         accelEditor.odr(25.f); // TODO
-//        accelEditor.odr((float) applicationPreferences.getAccelerometerSamplingRate());
+//        accelEditor.odr((float) dataIO.getAccelerometerSamplingRate());
         accelEditor.commit();
     }
 
@@ -245,7 +245,7 @@ public class MetawearService extends SensorService implements ServiceConnection 
      * Starts all enabled sensors and blinks LED on the Metawear board.
      */
     private void startSensors() {
-//        if (applicationPreferences.blinkLedWhileRunning()) // TODO
+//        if (dataIO.blinkLedWhileRunning()) // TODO
         turnOnLed(Led.Color.GREEN, true);
         startAccelerometer();
         startMotionDetection();

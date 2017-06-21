@@ -37,7 +37,7 @@ import bolts.Continuation;
 import bolts.Task;
 import cs.umass.edu.prepare.R;
 import cs.umass.edu.prepare.data.Medication;
-import cs.umass.edu.prepare.io.ApplicationPreferences;
+import cs.umass.edu.prepare.io.DataIO;
 
 /**
  * This UI allows the user to select a pill bottle to connect. Only one device may be selected.
@@ -58,7 +58,7 @@ public class SelectDeviceActivity extends AppCompatActivity implements ScannerCo
 
     private int medicationIndex = 0;
 
-    private ApplicationPreferences preferences;
+    private DataIO preferences;
 
     private List<Medication> medications;
 
@@ -88,7 +88,7 @@ public class SelectDeviceActivity extends AppCompatActivity implements ScannerCo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_metawear);
 
-        preferences = ApplicationPreferences.getInstance(this);
+        preferences = DataIO.getInstance(this);
         medications = preferences.getMedications(this);
 
         txtTitle = (TextView) findViewById(R.id.ble_scan_title);

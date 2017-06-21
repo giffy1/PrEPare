@@ -43,7 +43,7 @@ import cs.umass.edu.prepare.R;
 import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.data.Adherence;
 import cs.umass.edu.prepare.data.Medication;
-import cs.umass.edu.prepare.io.ApplicationPreferences;
+import cs.umass.edu.prepare.io.DataIO;
 import cs.umass.edu.prepare.reminders.NotificationPublisher;
 import cs.umass.edu.prepare.util.Utils;
 import cs.umass.edu.prepare.view.activities.CalendarActivity;
@@ -73,7 +73,7 @@ public class DataService extends Service {
 
     private TreeSet<Integer> reminders = new TreeSet<>();
 
-    private ApplicationPreferences applicationPreferences;
+    private DataIO dataIO;
 
     private MobileIOClient mClient;
 
@@ -83,12 +83,12 @@ public class DataService extends Service {
      * Loads the data from disk.
      */
     private void loadData(){
-        medications = applicationPreferences.getMedications(this);
-        schedule = applicationPreferences.getSchedule(this);
-        adherenceData = applicationPreferences.getAdherenceData(this);
-        addressMapping = applicationPreferences.getAddressMapping(this);
-        dosageMapping = applicationPreferences.getDosageMapping(this);
-        reminders = applicationPreferences.getReminders(this);
+        medications = dataIO.getMedications(this);
+        schedule = dataIO.getSchedule(this);
+        adherenceData = dataIO.getAdherenceData(this);
+        addressMapping = dataIO.getAddressMapping(this);
+        dosageMapping = dataIO.getDosageMapping(this);
+        reminders = dataIO.getReminders(this);
     }
 
     /**
@@ -105,7 +105,7 @@ public class DataService extends Service {
             medication.setDefaultImage(medImage);
             medications.add(medication);
         }
-        applicationPreferences.setMedications(this, medications);
+        dataIO.setMedications(this, medications);
     }
 
     /**
@@ -138,7 +138,7 @@ public class DataService extends Service {
             }
             schedule.put(medication, new Calendar[]{calendarAM, calendarPM});
         }
-        applicationPreferences.setSchedule(this, schedule);
+        dataIO.setSchedule(this, schedule);
     }
 
     /**
@@ -196,7 +196,7 @@ public class DataService extends Service {
             adherenceData.put(dateKey, medicationAdherence);
         }
         Log.i(TAG, adherenceData.toString());
-        applicationPreferences.setAdherenceData(this, adherenceData);
+        dataIO.setAdherenceData(this, adherenceData);
     }
 
     /**
@@ -328,7 +328,7 @@ public class DataService extends Service {
             } else {
                 medicationAdherence[0] = new Adherence(Adherence.AdherenceType.TAKEN_EARLY_OR_LATE, timeTaken);
             }
-            applicationPreferences.setAdherenceData(this, adherenceData);
+            dataIO.setAdherenceData(this, adherenceData);
         }
         cancelPillIntakeNotification(this);
     }
@@ -467,9 +467,9 @@ public class DataService extends Service {
 
     private void start() {
         Log.d(TAG, "start()");
-        if (applicationPreferences == null){
-            applicationPreferences = ApplicationPreferences.getInstance(this);
-            applicationPreferences.addOnDataChangedListener(this::loadData); // reload data when changed
+        if (dataIO == null){
+            dataIO = DataIO.getInstance(this);
+            dataIO.addOnDataChangedListener(this::loadData); // reload data when changed
         }
         loadData();
 

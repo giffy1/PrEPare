@@ -10,7 +10,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import cs.umass.edu.prepare.io.ApplicationPreferences;
+import cs.umass.edu.prepare.io.DataIO;
 import cs.umass.edu.prepare.view.activities.CalendarActivity;
 import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.R;
@@ -50,13 +50,13 @@ public abstract class SensorService extends Service implements ConnectionStateHa
      */
 //    protected BroadcastInterface broadcaster;
 
-    protected ApplicationPreferences applicationPreferences;
+    protected DataIO dataIO;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate()");
-        applicationPreferences = ApplicationPreferences.getInstance(this);
+        dataIO = DataIO.getInstance(this);
 //        broadcaster = new Broadcaster(this);
     }
 

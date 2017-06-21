@@ -180,7 +180,7 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
 
         long timestamp = System.currentTimeMillis(); //event.getTimestamp();
 
-//        if (applicationPreferences.writeServer()) {
+//        if (dataIO.writeServer()) {
             mClient.sendSensorReading(new AccelerometerReading(mUserID, "WEARABLE", "", timestamp,
                     accelerometerX, accelerometerY, accelerometerZ));
             mClient.sendSensorReading(new GyroscopeReading(mUserID, "WEARABLE", "", timestamp,

@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import cs.umass.edu.prepare.data.Adherence;
-import cs.umass.edu.prepare.io.ApplicationPreferences;
+import cs.umass.edu.prepare.io.DataIO;
 import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.data.Medication;
 import cs.umass.edu.prepare.R;
@@ -244,7 +244,7 @@ public class Utils {
 
         //------------------- SAVE TO DISK --------------------
 
-        ApplicationPreferences preferences = ApplicationPreferences.getInstance(context);
+        DataIO preferences = DataIO.getInstance(context);
         preferences.setAdherenceData(context, adherenceData);
         preferences.setSchedule(context, dailySchedule);
         preferences.setMedications(context, medications);

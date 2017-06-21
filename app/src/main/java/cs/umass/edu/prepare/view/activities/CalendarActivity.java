@@ -60,7 +60,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import cs.umass.edu.prepare.data.Adherence;
-import cs.umass.edu.prepare.io.ApplicationPreferences;
+import cs.umass.edu.prepare.io.DataIO;
 import cs.umass.edu.prepare.main.CheckForUpdatesTask;
 import cs.umass.edu.prepare.services.DataService;
 import cs.umass.edu.prepare.view.custom.CalendarAdapter;
@@ -119,7 +119,7 @@ public class CalendarActivity extends AppCompatActivity {
 	/** Used for formatting dates in mm/dd format. **/
 	private final SimpleDateFormat dayFormat = Constants.DATE_FORMAT.MONTH_DAY;
 
-	private ApplicationPreferences preferences;
+	private DataIO preferences;
 
 	private CustomMotionEventListener.OnSwipeListener onDetailsSwiped = new CustomMotionEventListener.OnSwipeListener() {
 		@Override
@@ -188,7 +188,7 @@ public class CalendarActivity extends AppCompatActivity {
 			p.edit().putBoolean("PREFERENCE_FIRST_RUN", false).apply();
 		}
 		if (preferences == null){
-			preferences = ApplicationPreferences.getInstance(this);
+			preferences = DataIO.getInstance(this);
 			preferences.addOnDataChangedListener(() -> CalendarActivity.this.runOnUiThread(CalendarActivity.this::refresh));
 		}
 		loadData();
@@ -417,7 +417,7 @@ public class CalendarActivity extends AppCompatActivity {
                 dailyAdherence[index].setTimeTaken(timeToTake);
             }
             refresh();
-            ApplicationPreferences preferences = ApplicationPreferences.getInstance(CalendarActivity.this);
+            DataIO preferences = DataIO.getInstance(CalendarActivity.this);
             preferences.setAdherenceData(this, adherenceData);
         });
 		b.show();
@@ -462,7 +462,7 @@ public class CalendarActivity extends AppCompatActivity {
             dialog.dismiss();
             refresh();
 
-            ApplicationPreferences preferences = ApplicationPreferences.getInstance(CalendarActivity.this);
+            DataIO preferences = DataIO.getInstance(CalendarActivity.this);
             preferences.setAdherenceData(this, adherenceData);
         });
 
