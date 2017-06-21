@@ -1,6 +1,8 @@
 package cs.umass.edu.customcalendar.util;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.GradientDrawable;
@@ -10,6 +12,7 @@ import android.widget.TimePicker;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -242,10 +245,41 @@ public class Utils {
         //------------------- SAVE TO DISK --------------------
 
         ApplicationPreferences preferences = ApplicationPreferences.getInstance(context);
-        preferences.setAdherenceData(adherenceData);
-        preferences.setDailySchedule(dailySchedule);
-        preferences.setMedications(medications);
-        preferences.setDosageMapping(dosageMapping);
-        preferences.scheduleReminders();
+        preferences.setAdherenceData(context, adherenceData);
+        preferences.setSchedule(context, dailySchedule);
+        preferences.setMedications(context, medications);
+        preferences.setDosageMapping(context, dosageMapping);
+    }
+
+    public static String getVersionName(Context context) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            return pi.versionName;
+        } catch (PackageManager.NameNotFoundException ignored) {}
+        return null;
+    }
+
+    /**
+     * Converts a Unix timestamp in milliseconds to a {@link Calendar} object, representing a date.
+     * @param timestamp a Unix timestamp in milliseconds
+     * @return a {@link Calendar} object.
+     */
+    public static Calendar timestampToCalendar(long timestamp) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date(timestamp));
+        return cal;
+    }
+
+    /**
+     * Converts a Unix timestamp in seconds to a {@link Calendar} object, representing a date.
+     * @param timestamp_in_seconds a Unix timestamp in seconds
+     * @return a {@link Calendar} object.
+     */
+    public static Calendar timestampToCalendar(int timestamp_in_seconds) {
+        long timestamp = timestamp_in_seconds * 1000L;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date(timestamp));
+        return cal;
     }
 }
