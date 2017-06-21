@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_group_alarm_title">Alarm Preferences</string>
+    <string name="pref_group_alarm_key">alarm-preference-group</string>
+
+    <string name="pref_volume_key">volume-preference</string>
+
+    <string name="pref_notification_text_key">notification-text</string>
+    <string name="pref_notification_text_title">Notification Text</string>
+    <string name="pref_notification_text_dialog_title">Enter Custom Notification</string>
+
+</resources>
