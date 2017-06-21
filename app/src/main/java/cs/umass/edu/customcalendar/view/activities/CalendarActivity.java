@@ -19,10 +19,8 @@ package cs.umass.edu.customcalendar.view.activities;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 
 
 import android.animation.ArgbEvaluator;
@@ -30,17 +28,23 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,18 +53,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import cs.umass.edu.customcalendar.data.Adherence;
 import cs.umass.edu.customcalendar.io.ApplicationPreferences;
+import cs.umass.edu.customcalendar.main.CheckForUpdatesTask;
+import cs.umass.edu.customcalendar.services.DataService;
 import cs.umass.edu.customcalendar.view.custom.CalendarAdapter;
 import cs.umass.edu.customcalendar.constants.Constants;
 import cs.umass.edu.customcalendar.view.gestures.CustomMotionEventListener;
@@ -75,7 +79,7 @@ public class CalendarActivity extends AppCompatActivity {
 	private final Calendar today;
 
 	/** The activity_calendar's date, indicating the month and year being viewed. Day is irrelevant. **/
-	public Calendar calendar;
+	public Calendar month;
 
 	/** The date the user selected, initially the current date. **/
 	private Calendar selectedDate;
@@ -86,25 +90,29 @@ public class CalendarActivity extends AppCompatActivity {
 	/** The handler is used to update the activity_calendar view asynchronously. **/
 	public Handler handler;
 
+
+
 	/** The list of medications. **/
-	private ArrayList<Medication> medications = new ArrayList<>();
+	private ArrayList<Medication> medications;
 
 	/** The entire adherence data. Date is stored in a tree map because dates are naturally ordered. **/
-	private Map<Calendar, Map<Medication, Adherence[]>> adherenceData = new TreeMap<>();
+	private Map<Calendar, Map<Medication, Adherence[]>> adherenceData;
 
 	/** Maps a medication to a dosage **/
-	private Map<Medication, Integer> dosageMapping = new HashMap<>(); // in mg
+	private Map<Medication, Integer> dosageMapping; // in mg
 
 	/** Maps a medication to a schedule (a list of times to take the medication). **/
-	private Map<Medication, Calendar[]> dailySchedule = new HashMap<>();
+	private Map<Medication, Calendar[]> dailySchedule;
 
-	/** Maps a medication to a unique Mac Address. **/
-	private Map<Medication, String> addressMapping = new HashMap<>();
+	/** Maps a medication to a unique Mac Address. TODO: reverse mapping **/
+	private Map<Medication, String> addressMapping;
+
+
 
 	/** Indicates whether the schedule details should be displayed, i.e. whether {@link #detailsView} is visible. **/
-	private boolean showDetails = false;
+	private boolean displayDetailsView = false;
 
-	/** Displays more detailed information for the {@link #selectedDate selected date}. Only visible if {@link #showDetails}=true.**/
+	/** Displays more detailed information for the {@link #selectedDate selected date}. Only visible if {@link #displayDetailsView}=true.**/
 	private View detailsView;
 
 	/** Used for formatting time of day. **/
@@ -112,6 +120,8 @@ public class CalendarActivity extends AppCompatActivity {
 
 	/** Used for formatting dates in mm/dd format. **/
 	private final SimpleDateFormat dayFormat = Constants.DATE_FORMAT.MONTH_DAY;
+
+	private ApplicationPreferences preferences;
 
 	private CustomMotionEventListener.OnSwipeListener onDetailsSwiped = new CustomMotionEventListener.OnSwipeListener() {
 		@Override
@@ -130,7 +140,7 @@ public class CalendarActivity extends AppCompatActivity {
 
 	public CalendarActivity(){
 		today = Calendar.getInstance();
-		calendar = Calendar.getInstance();
+		month = Calendar.getInstance();
 		selectedDate = Calendar.getInstance();
 	}
 
@@ -138,21 +148,51 @@ public class CalendarActivity extends AppCompatActivity {
 	 * Loads the medication, adherence, dosage and schedule data from disk.
 	 */
 	private void loadData(){
-		ApplicationPreferences preferences = ApplicationPreferences.getInstance(this);
+		medications = preferences.getMedications(this);
+		dosageMapping = preferences.getDosageMapping(this);
+		dailySchedule = preferences.getSchedule(this);
+		adherenceData = preferences.getAdherenceData(this);
+		addressMapping = preferences.getAddressMapping(this);
+	}
 
-		medications = preferences.getMedications();
-		dosageMapping = preferences.getDosageMapping();
-		dailySchedule = preferences.getDailySchedule();
-		adherenceData = preferences.getAdherenceData();
-		addressMapping = preferences.getAddressMapping();
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+		//the intent filter specifies the messages we are interested in receiving
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Constants.ACTION.BROADCAST_MESSAGE);
+		broadcastManager.registerReceiver(receiver, filter);
+	}
+
+	@Override
+	protected void onStop() {
+		LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+		try {
+			broadcastManager.unregisterReceiver(receiver);
+		}catch (IllegalArgumentException e){
+			e.printStackTrace();
+		}
+		super.onStop();
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_calendar);
 
-		if (Constants.GENERATE_DUMMY_DATA)
+		// on first run, create dummy data: // TODO : get rid of this when deploying
+		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean firstRun = p.getBoolean("PREFERENCE_FIRST_RUN", true);
+		if (firstRun) {
+			Log.i("PrEPare", "Initial run... Creating dummy data...");
 			Utils.setDummyAdherenceData(this);
+			p.edit().putBoolean("PREFERENCE_FIRST_RUN", false).apply();
+		}
+		if (preferences == null){
+			preferences = ApplicationPreferences.getInstance(this);
+			preferences.addOnDataChangedListener(() -> CalendarActivity.this.runOnUiThread(CalendarActivity.this::refreshCalendar));
+		}
 		loadData();
 
 		Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
@@ -176,7 +216,7 @@ public class CalendarActivity extends AppCompatActivity {
 
 		getSupportActionBar().setCustomView(v);
 
-		adapter = new CalendarAdapter(this, calendar, selectedDate);
+		adapter = new CalendarAdapter(this, month, selectedDate);
 		GridView gridview = (GridView) findViewById(R.id.gridview);
 		gridview.setAdapter(adapter);
 
@@ -190,7 +230,7 @@ public class CalendarActivity extends AppCompatActivity {
 		headers.setAdapter(headersAdapter);
 
 		TextView title  = (TextView) findViewById(R.id.title);
-		title.setText(android.text.format.DateFormat.format("MMMM yyyy", calendar));
+		title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
 		final TextView previous  = (TextView) findViewById(R.id.previous);
 		previous.setOnClickListener(new OnClickListener() {
 
@@ -209,12 +249,12 @@ public class CalendarActivity extends AppCompatActivity {
             TextView date = (TextView) v12.findViewById(R.id.date);
             if(date != null && !date.getText().equals("")) {
                 if (date.getText().toString().equals(String.valueOf(selectedDate.get(Calendar.DATE)))){
-                    showDetails = !showDetails;
+                    displayDetailsView = !displayDetailsView;
                 } else {
-                    showDetails = true;
+                    displayDetailsView = true;
                 }
-                selectedDate.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
-                selectedDate.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+                selectedDate.set(Calendar.MONTH, month.get(Calendar.MONTH));
+                selectedDate.set(Calendar.YEAR, month.get(Calendar.YEAR));
                 selectedDate.set(Calendar.DATE, Integer.valueOf(date.getText().toString()));
                 refresh();
             }
@@ -235,6 +275,16 @@ public class CalendarActivity extends AppCompatActivity {
 			Intent selectDeviceIntent = new Intent(this, SelectDeviceActivity.class);
 			startActivity(selectDeviceIntent);
 		}
+
+		new CheckForUpdatesTask(this).execute(true);
+
+//		Intent wearableServiceIntent = new Intent(this, WearableService.class);
+//		wearableServiceIntent.setAction(Constants.ACTION.START_SERVICE);
+//		startService(wearableServiceIntent);
+
+		Intent dataServiceIntent = new Intent(this, DataService.class);
+		dataServiceIntent.setAction(Constants.ACTION.START_SERVICE);
+		startService(dataServiceIntent);
 	}
 
 	@Override
@@ -253,12 +303,12 @@ public class CalendarActivity extends AppCompatActivity {
 	 * Changes the activity_calendar to display the next month.
 	 */
 	private void nextMonth(){
-		int month = calendar.get(Calendar.MONTH);
-		int year = calendar.get(Calendar.YEAR);
+		int month = this.month.get(Calendar.MONTH);
+		int year = this.month.get(Calendar.YEAR);
 		if(month == Calendar.DECEMBER) {
-			calendar.set(year+1,Calendar.JANUARY,1);
+			this.month.set(year+1,Calendar.JANUARY,1);
 		} else {
-			calendar.set(Calendar.MONTH, month+1);
+			this.month.set(Calendar.MONTH, month+1);
 		}
 		refreshCalendar();
 	}
@@ -267,24 +317,24 @@ public class CalendarActivity extends AppCompatActivity {
 	 * Changes the activity_calendar to show the previous month.
 	 */
 	private void previousMonth(){
-		int month = calendar.get(Calendar.MONTH);
-		int year = calendar.get(Calendar.YEAR);
+		int month = this.month.get(Calendar.MONTH);
+		int year = this.month.get(Calendar.YEAR);
 		if(month == Calendar.JANUARY) {
-			calendar.set(year-1,Calendar.DECEMBER,1);
+			this.month.set(year-1,Calendar.DECEMBER,1);
 		} else {
-			calendar.set(Calendar.MONTH, month-1);
+			this.month.set(Calendar.MONTH, month-1);
 		}
 		refreshCalendar();
 	}
 
 	private void refresh(){
-		adapter.setStyleBasics(showDetails);
+		adapter.setStyleBasic(displayDetailsView);
 		adapter.setSelectedDate(selectedDate);
 		refreshCalendar();
-		if (showDetails)
+		if (displayDetailsView)
 			updateDetails(Utils.getDateKey(selectedDate));
 		TextView txtDate = (TextView) findViewById(R.id.txtDate);
-		if (showDetails){
+		if (displayDetailsView){
 			txtDate.setVisibility(View.VISIBLE);
 			detailsView.setVisibility(View.VISIBLE);
 		} else {
@@ -305,8 +355,8 @@ public class CalendarActivity extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {
-		if (showDetails){
-			showDetails = false;
+		if (displayDetailsView){
+			displayDetailsView = false;
 			refresh();
 		} else {
 			super.onBackPressed();
@@ -323,14 +373,19 @@ public class CalendarActivity extends AppCompatActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.action_settings:
-				Intent intent = new Intent(this, SettingsActivity.class);
-				startActivity(intent);
-				return true;
-
 			case R.id.action_chart:
 				Intent progressIntent = new Intent(this, ProgressActivity.class);
 				startActivity(progressIntent);
+				return true;
+
+			case R.id.action_reminders:
+				Intent reminderIntent = new Intent(this, ReminderActivity.class);
+				startActivity(reminderIntent);
+				return true;
+
+			case R.id.action_settings:
+				Intent settingsIntent = new Intent(this, SettingsActivity.class);
+				startActivity(settingsIntent);
 				return true;
 
 			default:
@@ -371,7 +426,7 @@ public class CalendarActivity extends AppCompatActivity {
             }
             refresh();
             ApplicationPreferences preferences = ApplicationPreferences.getInstance(CalendarActivity.this);
-            preferences.setAdherenceData(adherenceData);
+            preferences.setAdherenceData(this, adherenceData);
         });
 		b.show();
 	}
@@ -416,7 +471,7 @@ public class CalendarActivity extends AppCompatActivity {
             refresh();
 
             ApplicationPreferences preferences = ApplicationPreferences.getInstance(CalendarActivity.this);
-            preferences.setAdherenceData(adherenceData);
+            preferences.setAdherenceData(this, adherenceData);
         });
 
 		dialog.show();
@@ -507,7 +562,7 @@ public class CalendarActivity extends AppCompatActivity {
 		adapter.notifyDataSetChanged();
 		handler.post(calendarUpdater);
 
-		title.setText(Constants.DATE_FORMAT.MMM_YYYY.format(calendar.getTime()));
+		title.setText(Constants.DATE_FORMAT.MMM_YYYY.format(month.getTime()));
 	}
 
 	/**
@@ -521,4 +576,73 @@ public class CalendarActivity extends AppCompatActivity {
 			adapter.notifyDataSetChanged();
 		}
 	};
+
+	/**
+	 * Shows a removable status message at the bottom of the application.
+	 * @param message the status message shown
+	 */
+	public void showStatus(final String message){
+		runOnUiThread(() -> Toast.makeText(CalendarActivity.this, message, Toast.LENGTH_LONG).show());
+	}
+
+	private final BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction() != null) {
+				if (intent.getAction().equals(Constants.ACTION.BROADCAST_MESSAGE)){
+					int message = intent.getIntExtra(Constants.KEY.MESSAGE, -1);
+					switch (message){
+						case Constants.MESSAGES.METAWEAR_CONNECTING:
+//							showStatus(getString(R.string.status_connection_attempt));
+							break;
+						case Constants.MESSAGES.METAWEAR_SERVICE_STOPPED:
+//							showStatus(getString(R.string.status_service_stopped));
+							break;
+						case Constants.MESSAGES.METAWEAR_CONNECTED:
+//							showStatus(getString(R.string.status_connected));
+							break;
+						case Constants.MESSAGES.METAWEAR_DISCONNECTED:
+							break;
+						case Constants.MESSAGES.WEARABLE_SERVICE_STARTED:
+							break;
+						case Constants.MESSAGES.WEARABLE_SERVICE_STOPPED:
+							break;
+						case Constants.MESSAGES.WEARABLE_CONNECTION_FAILED:
+							break;
+						case Constants.MESSAGES.WEARABLE_DISCONNECTED:
+							break;
+						case Constants.MESSAGES.NO_MOTION_DETECTED:
+//							showStatus(getString(R.string.status_no_motion));
+							break;
+						case Constants.MESSAGES.INVALID_ADDRESS:
+//							showStatus(getString(R.string.status_invalid_address));
+//							startActivityForResult(new Intent(MainActivity.this, SelectDeviceActivity.class), REQUEST_CODE.SELECT_DEVICE);
+							break;
+						case Constants.MESSAGES.BLUETOOTH_UNSUPPORTED:
+//							showStatus(getString(R.string.status_bluetooth_unsupported));
+							break;
+						case Constants.MESSAGES.BLUETOOTH_DISABLED:
+							// showStatus(getString(R.string.status_bluetooth_disabled));
+							Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+							startActivityForResult(enableBtIntent, Constants.REQUEST_CODE.ENABLE_BLUETOOTH);
+							break;
+						case Constants.MESSAGES.SERVER_CONNECTION_FAILED:
+							break;
+						case Constants.MESSAGES.SERVER_CONNECTION_SUCCEEDED:
+							break;
+						case Constants.MESSAGES.SERVER_DISCONNECTED:
+							break;
+						case Constants.MESSAGES.PILL_INTAKE_GESTURE_DETECTED:
+							Medication medication = (Medication) intent.getSerializableExtra(Constants.KEY.MEDICATION);
+							Calendar timeTaken = (Calendar) intent.getSerializableExtra(Constants.KEY.TIME_TAKEN);
+							// TODO
+							break;
+					}
+				}
+			}
+		}
+	};
+
+
+
 }
