@@ -63,6 +63,9 @@ public class ProgressActivity extends BaseActivity {
 
     private SimpleDateFormat monthFormat = Constants.DATE_FORMAT.MMM_YY;
 
+    private SimpleDateFormat weekFormat = Constants.DATE_FORMAT.MONTH_DAY;
+
+    /** Indicates whether aggregate data is displayed by month (true) or by week (false). */
     private boolean byMonth = true;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -91,26 +94,29 @@ public class ProgressActivity extends BaseActivity {
         // TODO: sizes not device independent
         plot.getLegend().setSize(new Size(new SizeMetric(200, SizeMode.ABSOLUTE), new SizeMetric(1000, SizeMode.ABSOLUTE)));
 
-        // format domain to display month in format MM YYYY
+        // format domain to display date in format MM YYYY
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat(new Format() {
-            private Calendar month;
+            private Calendar date;
             @Override
             public StringBuffer format(Object obj, @NonNull StringBuffer toAppendTo, @NonNull FieldPosition pos) {
                 int index = (int) Float.parseFloat(obj.toString());
                 if (index == 0) {
-                    month = Calendar.getInstance(); // reset
+                    date = Calendar.getInstance(); // reset
                     if (byMonth)
-                        month.add(Calendar.MONTH, 1-numberOfDataPoints);
+                        date.add(Calendar.MONTH, 1-numberOfDataPoints);
                     else
-                        month.add(Calendar.WEEK_OF_YEAR, 1-numberOfDataPoints);
+                        date.add(Calendar.WEEK_OF_YEAR, 1-numberOfDataPoints);
                 }
                 if (index >= 0 && index < numberOfDataPoints) { // -1 and numberOfDataPoints are included to ensure there is a margin
                     if (byMonth) {
-                        String monthStr = monthFormat.format(month.getTime());
-                        month.add(Calendar.MONTH, 1); // next month
+                        String monthStr = monthFormat.format(date.getTime());
+                        date.add(Calendar.MONTH, 1); // next date
                         return toAppendTo.append(monthStr);
                     } else {
-                        return toAppendTo.append("Week ").append(index+1);
+                        date.set(Calendar.DAY_OF_WEEK, date.getFirstDayOfWeek());
+                        String weekStr = weekFormat.format(date.getTime());
+                        date.add(Calendar.DATE, 7); // next week
+                        return toAppendTo.append(weekStr);
                     }
                 } else {
                     return toAppendTo.append("");
@@ -130,8 +136,8 @@ public class ProgressActivity extends BaseActivity {
 
         // populate data:
         ApplicationPreferences preferences = ApplicationPreferences.getInstance (this);
-        medications = preferences.getMedications();
-        adherenceData = preferences.getAdherenceData();
+        medications = preferences.getMedications(this);
+        adherenceData = preferences.getAdherenceData(this);
         medicationCheckedMapping = new HashMap<>();
         if (medications == null){
             Toast.makeText(this, "No medications found. Please contact your primary care provider.", Toast.LENGTH_SHORT).show();
@@ -145,15 +151,13 @@ public class ProgressActivity extends BaseActivity {
         lvMedications.setAdapter(listAdapter);
         listAdapter.notifyDataSetChanged();
 
-        listAdapter.setOnCheckedChangeListener(new MedicationCheckboxAdapter.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChange(int position, View view, boolean checked) {
-                medicationCheckedMapping.put(medications.get(position), checked);
-                updatePlot();
-            }
+        listAdapter.setOnCheckedChangeListener((position, view, checked) -> {
+            medicationCheckedMapping.put(medications.get(position), checked);
+            updatePlot();
         });
 
         RadioGroup radioPlotType = (RadioGroup) findViewById(R.id.radio_plot_type);
+        // TODO : For some reason, using lambda expression here causes exception:
         radioPlotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, @IdRes int id) {
