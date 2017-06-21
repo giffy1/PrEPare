@@ -519,8 +519,10 @@ public class CalendarActivity extends AppCompatActivity {
 					case FUTURE:
 						timeTaken.setText(timeFormat.format(schedule[index].getTime()));
 						break;
-					default:
-						timeTaken.setText(timeFormat.format(adherence[index].getTimeTaken().getTime()));
+					default: // taken on-time or taken late/early
+						Calendar time = adherence[index].getTimeTaken();
+						if (time != null)
+							timeTaken.setText(timeFormat.format(time.getTime()));
 						break;
 				}
 			}
