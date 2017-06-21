@@ -161,12 +161,7 @@ public class ReminderActivity extends BaseActivity {
         updateStringSet();
 
         Button cancelButton = (Button) findViewById(R.id.btn_cancel_settings);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        cancelButton.setOnClickListener(view -> finish());
 
         if (medications == null){
             Toast.makeText(this, "No medications found. Please contact your primary care provider.", Toast.LENGTH_SHORT).show();
@@ -180,12 +175,7 @@ public class ReminderActivity extends BaseActivity {
             selectedPosition = position;
             view.setSelected(true);
         });
-        medicationsList.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
-                medicationsList.getChildAt(0).setSelected(true);
-            }
-        });
+        medicationsList.addOnLayoutChangeListener((view, i, i1, i2, i3, i4, i5, i6, i7) -> medicationsList.getChildAt(0).setSelected(true));
 
         Button adjustButton = (Button) findViewById(R.id.btn_adjust);
         adjustButton.setOnClickListener(view -> {

@@ -157,12 +157,9 @@ public class ProgressActivity extends BaseActivity {
 
         RadioGroup radioPlotType = (RadioGroup) findViewById(R.id.radio_plot_type);
         // TODO : For some reason, using lambda expression here causes exception:
-        radioPlotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int id) {
-                byMonth = (id==R.id.radio_by_month);
-                updatePlot();
-            }
+        radioPlotType.setOnCheckedChangeListener((radioGroup, id) -> {
+            byMonth = (id==R.id.radio_by_month);
+            updatePlot();
         });
 
         updatePlot();

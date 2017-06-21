@@ -230,13 +230,7 @@ public class CalendarActivity extends AppCompatActivity {
 		TextView title  = (TextView) findViewById(R.id.title);
 		title.setText(android.text.format.DateFormat.format("MMMM yyyy", month));
 		final TextView previous  = (TextView) findViewById(R.id.previous);
-		previous.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				previousMonth();
-			}
-		});
+		previous.setOnClickListener(v13 -> previousMonth());
 
 		TextView next  = (TextView) findViewById(R.id.next);
 		next.setOnClickListener(v1 -> nextMonth());
