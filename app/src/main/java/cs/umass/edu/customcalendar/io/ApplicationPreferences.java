@@ -103,20 +103,22 @@ public class ApplicationPreferences {
     private void writeObject(Context context, Object object, String filename){
         this.onDataChangedListeners.forEach(OnDataChangedListener::onDataChanged);
 
-        Runnable r = () -> {
-            File file = new File(context.getDir("data", Context.MODE_PRIVATE), filename);
-            try {
-                ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-                outputStream.writeObject(object);
-                outputStream.flush();
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        };
+        File file = new File(context.getDir("data", Context.MODE_PRIVATE), filename);
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
+            outputStream.writeObject(object);
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        Thread t = new Thread(r); // save to disk on background thread
-        t.start();
+//        Runnable r = () -> {
+//
+//        };
+//
+//        Thread t = new Thread(r); // save to disk on background thread
+//        t.start();
     }
 
     public void setMedications(Context context, ArrayList<Medication> medications){
