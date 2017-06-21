@@ -47,16 +47,22 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                finish();
-                startActivity(intent);
-                return true;
 
             case R.id.action_chart:
                 Intent progressIntent = new Intent(this, ProgressActivity.class);
                 finish();
                 startActivity(progressIntent);
+                return true;
+
+            case R.id.action_reminders:
+                Intent reminderIntent = new Intent(this, ReminderActivity.class);
+                finish();
+                startActivity(reminderIntent);
+                return true;
+
+            case R.id.action_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
 
             default:
