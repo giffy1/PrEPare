@@ -7,4 +7,7 @@
     <string name="pref_notification_text_title">Notification Text</string>
     <string name="pref_notification_text_dialog_title">Enter Custom Notification</string>
 
+    <string name="pref_check_for_updates_key">check-for-updates</string>
+    <string name="pref_check_for_updates_title">Check for Updates</string>
+
 </resources>

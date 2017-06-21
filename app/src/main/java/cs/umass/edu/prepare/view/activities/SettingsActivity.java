@@ -3,11 +3,13 @@ package cs.umass.edu.prepare.view.activities;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 
 import cs.umass.edu.prepare.R;
+import cs.umass.edu.prepare.main.CheckForUpdatesTask;
 import cs.umass.edu.prepare.services.DataService;
 
 /**
@@ -34,7 +36,17 @@ public class SettingsActivity extends PreferenceActivity {
 
             prefNotificationText = (EditTextPreference) findPreference(getString(R.string.pref_notification_text_key));
             prefNotificationText.setSummary(prefNotificationText.getText());
+
+            initializeCheckForUpdatesPreference();
         }
+
+        private void initializeCheckForUpdatesPreference(){
+            findPreference(getString(R.string.pref_check_for_updates_key)).setOnPreferenceClickListener(preference -> {
+                new CheckForUpdatesTask(getActivity()).execute();
+                return true;
+            });
+        }
+
 
         @Override
         public void onResume() {
