@@ -203,8 +203,7 @@ public class CalendarActivity extends AppCompatActivity {
 			actionBar.setDisplayShowCustomEnabled(true);
 		}
 
-		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		final View v = inflater.inflate(R.layout.menu_item_today, null);
+		final View v = View.inflate(this, R.layout.menu_item_today, null);
 
 		TextView txtDate = (TextView) v.findViewById(R.id.txt_today);
 		txtDate.setText(String.valueOf(today.get(Calendar.DATE)));
@@ -477,11 +476,11 @@ public class CalendarActivity extends AppCompatActivity {
 		dialog.show();
 	}
 
-	private void insertDetailsForDate (final Calendar dateKey, LayoutInflater vi, ViewGroup insertPoint) {
+	private void insertDetailsForDate (final Calendar dateKey, ViewGroup insertPoint) {
 
 		final Map<Medication, Adherence[]> adherenceMap = adherenceData.get(dateKey);
 		for (final Medication medication : medications) {
-			View details = vi.inflate(R.layout.view_adherence_details_full, null);
+			View details = View.inflate(this, R.layout.view_adherence_details_full, null);
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 					LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
@@ -542,13 +541,12 @@ public class CalendarActivity extends AppCompatActivity {
 		TextView txtDate = (TextView) findViewById(R.id.txtDate);
 		txtDate.setText(dayFormat.format(selectedDate.getTime()) + "\n" + selectedDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()));
 
-		LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		ViewGroup insertPoint = (ViewGroup) findViewById(R.id.details);
 		insertPoint.removeAllViews();
 
 		if (adherenceData != null) {
 			if (adherenceData.containsKey(dateKey))
-				insertDetailsForDate(dateKey, vi, insertPoint);
+				insertDetailsForDate(dateKey, insertPoint);
 		}
 	}
 
