@@ -189,7 +189,7 @@ public class CalendarActivity extends AppCompatActivity {
 		}
 		if (preferences == null){
 			preferences = ApplicationPreferences.getInstance(this);
-			preferences.addOnDataChangedListener(() -> CalendarActivity.this.runOnUiThread(CalendarActivity.this::refreshCalendar));
+			preferences.addOnDataChangedListener(() -> CalendarActivity.this.runOnUiThread(CalendarActivity.this::refresh));
 		}
 		loadData();
 
