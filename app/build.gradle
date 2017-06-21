@@ -8,7 +8,7 @@ android {
         jackOptions {
             enabled true
         }
-        applicationId "cs.umass.edu.customcalendar"
+        applicationId "cs.umass.edu.prepare"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
