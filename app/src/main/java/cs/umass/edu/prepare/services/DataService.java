@@ -43,7 +43,7 @@ import cs.umass.edu.prepare.R;
 import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.data.Adherence;
 import cs.umass.edu.prepare.data.Medication;
-import cs.umass.edu.prepare.io.DataIO;
+import cs.umass.edu.prepare.data.DataIO;
 import cs.umass.edu.prepare.reminders.NotificationPublisher;
 import cs.umass.edu.prepare.util.Utils;
 import cs.umass.edu.prepare.view.activities.CalendarActivity;

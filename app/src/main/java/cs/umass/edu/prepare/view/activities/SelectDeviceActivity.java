@@ -37,7 +37,7 @@ import bolts.Continuation;
 import bolts.Task;
 import cs.umass.edu.prepare.R;
 import cs.umass.edu.prepare.data.Medication;
-import cs.umass.edu.prepare.io.DataIO;
+import cs.umass.edu.prepare.data.DataIO;
 
 /**
  * This UI allows the user to select a pill bottle to connect. Only one device may be selected.

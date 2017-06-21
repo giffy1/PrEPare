@@ -1,4 +1,4 @@
-package cs.umass.edu.prepare.io;
+package cs.umass.edu.prepare.data;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,9 +14,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-
-import cs.umass.edu.prepare.data.Adherence;
-import cs.umass.edu.prepare.data.Medication;
 
 /**
  * A simplified preference manager which exposes the relevant variables

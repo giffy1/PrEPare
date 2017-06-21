@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import cs.umass.edu.prepare.data.Adherence;
-import cs.umass.edu.prepare.io.DataIO;
+import cs.umass.edu.prepare.data.DataIO;
 import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.data.Medication;
 import cs.umass.edu.prepare.R;

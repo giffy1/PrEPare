@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import cs.umass.edu.prepare.data.Adherence;
-import cs.umass.edu.prepare.io.DataIO;
+import cs.umass.edu.prepare.data.DataIO;
 import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.data.Medication;
 import cs.umass.edu.prepare.view.custom.MedicationCheckboxAdapter;

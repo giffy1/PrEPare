@@ -10,7 +10,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import cs.umass.edu.prepare.io.DataIO;
+import cs.umass.edu.prepare.data.DataIO;
 import cs.umass.edu.prepare.view.activities.CalendarActivity;
 import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.R;

@@ -60,7 +60,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import cs.umass.edu.prepare.data.Adherence;
-import cs.umass.edu.prepare.io.DataIO;
+import cs.umass.edu.prepare.data.DataIO;
 import cs.umass.edu.prepare.main.CheckForUpdatesTask;
 import cs.umass.edu.prepare.services.DataService;
 import cs.umass.edu.prepare.view.custom.CalendarAdapter;
