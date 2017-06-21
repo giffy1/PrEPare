@@ -9,8 +9,15 @@
         app:showAsAction="ifRoom"/>
 
     <item
+        android:id="@+id/action_reminders"
+        android:icon="@drawable/ic_alarm_white_24dp"
+        android:title="@string/menu_item_title_reminders"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings_white_24dp"
         android:title="@string/menu_item_title_settings"
         app:showAsAction="ifRoom"/>
+
 </menu>
