@@ -50,7 +50,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -391,8 +390,9 @@ public class CalendarActivity extends AppCompatActivity {
 	/**
 	 * Allows the user to edit adherence.
 	 * TODO: This is only available for easy debugging and data manipulation.
-	 * @param medication
-	 * @param index
+	 * @param medication the medication for which the adherence is being edited.
+	 * @param dateKey the date for which the adherence is being edited.
+	 * @param index the index into the adherence array, that is either AM or PM.
 	 */
 	private void editAdherence(final Medication medication, final Calendar dateKey, final int index){
 		AlertDialog.Builder b = new AlertDialog.Builder(this);
@@ -626,9 +626,9 @@ public class CalendarActivity extends AppCompatActivity {
 						case Constants.MESSAGES.SERVER_DISCONNECTED:
 							break;
 						case Constants.MESSAGES.PILL_INTAKE_GESTURE_DETECTED:
-							Medication medication = (Medication) intent.getSerializableExtra(Constants.KEY.MEDICATION);
-							Calendar timeTaken = (Calendar) intent.getSerializableExtra(Constants.KEY.TIME_TAKEN);
-							// TODO
+//							Medication medication = (Medication) intent.getSerializableExtra(Constants.KEY.MEDICATION);
+//							Calendar timeTaken = (Calendar) intent.getSerializableExtra(Constants.KEY.TIME_TAKEN);
+//							// TODO
 							break;
 					}
 				}
