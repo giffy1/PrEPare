@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.TreeSet;
 
 /**
- * A simplified preference manager which exposes the relevant variables
- * and updates the variables automatically when the preferences are changed.
+ * This class is responsible for reading and writing data to disk and managing
+ * data shared across application components.
  */
 public class DataIO {
 
