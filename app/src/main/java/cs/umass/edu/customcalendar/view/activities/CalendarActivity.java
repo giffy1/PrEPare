@@ -518,10 +518,10 @@ public class CalendarActivity extends AppCompatActivity {
 						adherenceViews[index].setVisibility(View.INVISIBLE);
 						break;
 					case MISSED:
-						timeTaken.setText("Missed!");
+						timeTaken.setText(R.string.adherence_text_missed);
 						break;
 					case TAKEN_CLARIFY_TIME:
-						timeTaken.setText("Unknown");
+						timeTaken.setText(R.string.adherence_text_unknown);
 						break;
 					case FUTURE:
 						timeTaken.setText(timeFormat.format(schedule[index].getTime()));
