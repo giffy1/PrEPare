@@ -10,7 +10,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_weight="0.2"/>
+            android:layout_weight="0.2"
+            tools:ignore="UselessLeaf" />
+        <!-- suppress useless-leaf warning : empty layout above is necessary to position other views properly.  -->
         <CheckBox
             android:layout_width="0dp"
             android:layout_height="wrap_content"
