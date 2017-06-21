@@ -144,7 +144,7 @@ public class SelectDeviceActivity extends AppCompatActivity implements ScannerCo
         getApplicationContext().unbindService(this);
     }
 
-    public static Task<Void> reconnect(final MetaWearBoard board) {
+    private static Task<Void> reconnect(final MetaWearBoard board) {
         return board.connectAsync()
                 .continueWithTask(task -> {
                     if (task.isFaulted()) {
