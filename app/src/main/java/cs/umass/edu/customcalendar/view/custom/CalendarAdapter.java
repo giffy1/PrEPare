@@ -95,16 +95,13 @@ public class CalendarAdapter extends BaseAdapter {
         View v = convertView;
     	TextView dayView;
         if (convertView == null) {  // if it's not recycled, initialize some attributes
-        	LayoutInflater vi = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(R.layout.calendar_item, null);
-        	
+            v = View.inflate(mContext, R.layout.calendar_item, null);
         }
 
-        LayoutInflater vi = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ViewGroup insertPoint = (ViewGroup) v.findViewById(R.id.layout_calendar_item);
         insertPoint.removeAllViews();
 
-        dayView = (TextView) vi.inflate(R.layout.textview_date, null);
+        dayView = (TextView) View.inflate(mContext, R.layout.textview_date, null);
         insertPoint.addView(dayView);
 
         // disable empty days from the beginning
@@ -151,7 +148,7 @@ public class CalendarAdapter extends BaseAdapter {
             if (data.containsKey(dateKey)) {
                 Map<Medication, Adherence[]> adherenceMap = data.get(dateKey);
                 for (Medication medication : medications) {
-                    View calendarItem = vi.inflate(R.layout.view_adherence_details_simple, null);
+                    View calendarItem = View.inflate(mContext, R.layout.view_adherence_details_simple, null);
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
