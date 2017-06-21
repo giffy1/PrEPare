@@ -32,6 +32,7 @@ import cs.umass.edu.customcalendar.R;
 import cs.umass.edu.customcalendar.constants.Constants;
 import cs.umass.edu.customcalendar.data.Medication;
 import cs.umass.edu.customcalendar.io.ApplicationPreferences;
+import cs.umass.edu.customcalendar.services.DataService;
 import cs.umass.edu.customcalendar.util.Utils;
 import cs.umass.edu.customcalendar.view.custom.MedicationArrayAdapter;
 
@@ -65,9 +66,6 @@ public class SettingsActivity extends BaseActivity {
     /** The time picker for the second pill (PM). **/
     private TimePicker timePickerPM;
 
-    /** The number picker for the medication dosage. **/
-    private NumberPicker dosagePicker;
-
     /** The position of the selected medication. **/
     private int selectedPosition=0;
 
@@ -94,7 +92,6 @@ public class SettingsActivity extends BaseActivity {
 
         timePickerAM = (TimePicker) dialog.findViewById(R.id.timePickerAM);
         timePickerPM = (TimePicker) dialog.findViewById(R.id.timePickerPM);
-        dosagePicker = (NumberPicker) dialog.findViewById(R.id.dosagePicker);
 
         setTimePickerInterval(timePickerAM);
         setTimePickerInterval(timePickerPM);
@@ -123,36 +120,11 @@ public class SettingsActivity extends BaseActivity {
             labelPM.setVisibility(View.VISIBLE);
         }
 
-        int minValue = 50;
-        int maxValue = 500;
-        int increment = 25;
-        int numberOfValues = 1 + (maxValue - minValue) / increment;
-        final String[] minuteValues = new String[numberOfValues];
-
-        int index = 0;
-        for (int i = minValue; i <= maxValue; i+=increment) {
-            minuteValues[index++] = String.valueOf(i) + " mg";
-        }
-        dosagePicker.setMaxValue(numberOfValues-1);
-        dosagePicker.setDisplayedValues(minuteValues);
-        dosagePicker.setValue((dosageMapping.get(medication) - minValue) / increment);
-        // TODO: Why doesn't this work??
-//        dosagePicker.setFormatter(new NumberPicker.Formatter() {
-//            @Override
-//            public String format(int i) {
-//                return i + " mg";
-//            }
-//        });
-//        dosagePicker.invalidate();
-
         Button cancelButton = (Button) dialog.findViewById(R.id.btn_cancel);
         cancelButton.setOnClickListener(v -> dialog.dismiss());
 
         Button saveButton = (Button) dialog.findViewById(R.id.btn_save);
         saveButton.setOnClickListener(v -> {
-            String dosageStr = minuteValues[dosagePicker.getValue()];
-            int dosage = Integer.parseInt(dosageStr.split(" ")[0]);
-            dosageMapping.put(medication, dosage);
 
             Calendar timeAM = Utils.getTime(timePickerAM);
             Calendar timePM = Utils.getTime(timePickerPM);
@@ -175,10 +147,10 @@ public class SettingsActivity extends BaseActivity {
 
             // persist to disk
             ApplicationPreferences preferences = ApplicationPreferences.getInstance(SettingsActivity.this);
-            preferences.setMedications(medications);
-            preferences.setDosageMapping(dosageMapping);
-            preferences.setDailySchedule(dailySchedule);
-            preferences.scheduleReminders();
+            preferences.setMedications(this, medications);
+            preferences.setSchedule(this, dailySchedule);
+
+            DataService.scheduleReminders(this);
         });
 
         TextView takePhoto = (TextView) dialog.findViewById(R.id.take_photo);
@@ -248,7 +220,7 @@ public class SettingsActivity extends BaseActivity {
 
         medications = preferences.getMedications();
         dosageMapping = preferences.getDosageMapping();
-        dailySchedule = preferences.getDailySchedule();
+        dailySchedule = preferences.getSchedule();
     }
 
     public void onCreate(Bundle savedInstanceState) {
@@ -258,7 +230,12 @@ public class SettingsActivity extends BaseActivity {
         loadData();
 
         Button cancelButton = (Button) findViewById(R.id.btn_cancel_settings);
-        cancelButton.setOnClickListener(view -> finish());
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         if (medications == null){
             Toast.makeText(this, "No medications found. Please contact your primary care provider.", Toast.LENGTH_SHORT).show();
