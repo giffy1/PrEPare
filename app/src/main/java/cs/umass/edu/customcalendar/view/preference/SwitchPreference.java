@@ -15,7 +15,6 @@ import info.hoang8f.android.segmented.SegmentedGroup;
 
 /**
  * @author Sean Noran
- * @affiliation University of Massachusetts Amherst
  */
 public class SwitchPreference extends Preference {
 

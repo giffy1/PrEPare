@@ -45,7 +45,6 @@ import cs.umass.edu.customcalendar.io.ApplicationPreferences;
  * to differentiate devices with the same name.
  *
  * @author Sean Noran
- * @affiliation University of Massachusetts Amherst
  *
  * @see <a href="https://github.com/mbientlab/Metawear-SampleAndroidApp/blob/master/app/src/main/java/com/mbientlab/metawear/app/ScannerActivity.java">ScannerActivity</a>
  * @see ScannerCommunicationBus
