@@ -40,6 +40,17 @@ public class DataIO {
 
     private static DataIO instance;
 
+    private interface FILENAME {
+        String MEDICATIONS = "medications";
+        String DOSAGE_MAPPING = "dosage_mapping";
+        String SCHEDULE = "daily_schedule";
+        String ADHERENCE_DATA = "adherence_data";
+        String ADDRESS_MAPPING = "address_mapping";
+        String REMINDERS = "reminders";
+    }
+
+    private static final String DIRECTORY = "data";
+
     public interface OnDataChangedListener {
         void onDataChanged();
     }
@@ -62,12 +73,12 @@ public class DataIO {
 
     @SuppressWarnings("unchecked")
     private void loadPreferences(Context context){
-        medications = (ArrayList<Medication>) readObject(context, "medications");
-        dosageMapping = (Map<Medication, Integer>) readObject(context, "dosage_mapping");
-        schedule = (Map<Medication, Calendar[]>) readObject(context, "daily_schedule");
-        adherenceData = (Map<Calendar, Map<Medication, Adherence[]>>) readObject(context, "adherence_data");
-        addressMapping = (Map<Medication, String>) readObject(context, "address_mapping");
-        reminders = (TreeSet<Integer>) readObject(context, "reminders");
+        medications = (ArrayList<Medication>) readObject(context, FILENAME.MEDICATIONS);
+        dosageMapping = (Map<Medication, Integer>) readObject(context, FILENAME.DOSAGE_MAPPING);
+        schedule = (Map<Medication, Calendar[]>) readObject(context, FILENAME.SCHEDULE);
+        adherenceData = (Map<Calendar, Map<Medication, Adherence[]>>) readObject(context, FILENAME.ADHERENCE_DATA);
+        addressMapping = (Map<Medication, String>) readObject(context, FILENAME.ADDRESS_MAPPING);
+        reminders = (TreeSet<Integer>) readObject(context, FILENAME.REMINDERS);
     }
 
     /**
@@ -78,7 +89,7 @@ public class DataIO {
      */
     private Object readObject(Context context, String filename) {
         Object object = null;
-        File file = new File(context.getDir("data", Context.MODE_PRIVATE), filename);
+        File file = new File(context.getDir(DIRECTORY, Context.MODE_PRIVATE), filename);
         try {
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
             object = inputStream.readObject();
@@ -106,7 +117,7 @@ public class DataIO {
             Object object = params[0];
             String filename = (String) params[1];
 
-            File file = new File(context.getDir("data", Context.MODE_PRIVATE), filename);
+            File file = new File(context.getDir(DIRECTORY, Context.MODE_PRIVATE), filename);
             try {
                 ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
                 outputStream.writeObject(object);
@@ -141,32 +152,32 @@ public class DataIO {
 
     public void setMedications(Context context, ArrayList<Medication> medications){
         this.medications = medications;
-        writeObject(context, medications, "medications");
+        writeObject(context, medications, FILENAME.MEDICATIONS);
     }
 
     public void setAdherenceData(Context context, Map<Calendar, Map<Medication, Adherence[]>> adherenceData){
         this.adherenceData = adherenceData;
-        writeObject(context, adherenceData, "adherence_data");
+        writeObject(context, adherenceData, FILENAME.ADHERENCE_DATA);
     }
 
     public void setSchedule(Context context, Map<Medication, Calendar[]> schedule){
         this.schedule = schedule;
-        writeObject(context, schedule, "daily_schedule");
+        writeObject(context, schedule, FILENAME.SCHEDULE);
     }
 
     public void setDosageMapping(Context context, Map<Medication, Integer> dosageMapping){
         this.dosageMapping = dosageMapping;
-        writeObject(context, dosageMapping, "dosage_mapping");
+        writeObject(context, dosageMapping, FILENAME.DOSAGE_MAPPING);
     }
 
     public void setAddressMapping(Context context, Map<Medication, String> addressMapping){
         this.addressMapping = addressMapping;
-        writeObject(context, addressMapping, "address_mapping");
+        writeObject(context, addressMapping, FILENAME.ADDRESS_MAPPING);
     }
 
     public void setReminders(Context context, TreeSet<Integer> reminders) {
         this.reminders = reminders;
-        writeObject(context, reminders, "reminders");
+        writeObject(context, reminders, FILENAME.REMINDERS);
     }
 
     public ArrayList<Medication> getMedications(Context context){
