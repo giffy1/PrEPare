@@ -77,16 +77,16 @@ public class CalendarActivity extends AppCompatActivity {
 	private final Calendar today;
 
 	/** The activity_calendar's date, indicating the month and year being viewed. Day is irrelevant. **/
-	public final Calendar month;
+	private final Calendar month;
 
 	/** The date the user selected, initially the current date. **/
 	private final Calendar selectedDate;
 
 	/** The adapter for displaying the custom activity_calendar. **/
-	public CalendarAdapter adapter;
+	private CalendarAdapter adapter;
 
 	/** The handler is used to update the activity_calendar view asynchronously. **/
-	public Handler handler;
+	private Handler handler;
 
 
 
@@ -548,7 +548,7 @@ public class CalendarActivity extends AppCompatActivity {
 	/**
 	 * Refreshes the activity_calendar view asynchronously and displays the selected month and year.
 	 */
-	public void refreshCalendar() {
+	private void refreshCalendar() {
 		TextView title  = (TextView) findViewById(R.id.title);
 
 		adapter.refreshDays();
@@ -561,7 +561,7 @@ public class CalendarActivity extends AppCompatActivity {
 	/**
 	 * Asynchronously updates the data displayed in the activity_calendar view.
 	 */
-	public final Runnable calendarUpdater = new Runnable() {
+	private final Runnable calendarUpdater = new Runnable() {
 		@Override
 		public void run() {
 			adapter.setData(adherenceData);
