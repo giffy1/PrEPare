@@ -41,6 +41,7 @@
     <string name="url_mobile_apk_shortened">https://goo.gl/CXRWRj</string>
     <string name="url_mobile_apk"><![CDATA[https://drive.google.com/uc?export=view&id=0Byr6oHEGQO73VGl0c2tnYmttU0k]]></string>
     <string name="url_mobile_version"><![CDATA[https://drive.google.com/uc?export=view&id=0Byr6oHEGQO73dFRFbW9SOExTVzg]]></string>
+    <string name="link_mbientlab">https://metawear.mbientlab.com</string>
     <string name="mobile_health_client_user_id">91.e6.eb.8d.65.ee.a5.e3.5a.b3</string>
 
     <string name="title_connecting">Configuring…</string>
@@ -58,4 +59,7 @@
     <string name="adherence_text_missed">Missed!</string>
     <string name="adherence_text_unknown">Unknown</string>
     <integer name="pref_volume_index_default">1</integer>
+
+    <string name="about_app_version" formatted="false">Version %1$s</string>
+    <string name="about_powered_by_metawear">Powered by Metawear</string>
 </resources>

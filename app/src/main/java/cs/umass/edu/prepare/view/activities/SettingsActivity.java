@@ -1,5 +1,6 @@
 package cs.umass.edu.prepare.view.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -38,11 +39,20 @@ public class SettingsActivity extends PreferenceActivity {
             prefNotificationText.setSummary(prefNotificationText.getText());
 
             initializeCheckForUpdatesPreference();
+            initializeAboutPreference();
         }
 
         private void initializeCheckForUpdatesPreference(){
             findPreference(getString(R.string.pref_check_for_updates_key)).setOnPreferenceClickListener(preference -> {
                 new CheckForUpdatesTask(getActivity()).execute();
+                return true;
+            });
+        }
+
+        private void initializeAboutPreference(){
+            findPreference(getString(R.string.pref_about_key)).setOnPreferenceClickListener(preference -> {
+                Intent intent = new Intent(getActivity(), AboutActivity.class);
+                startActivity(intent);
                 return true;
             });
         }

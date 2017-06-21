@@ -17,4 +17,8 @@
         android:key="@string/pref_check_for_updates_key"
         android:title="@string/pref_check_for_updates_title" />
 
+    <Preference
+        android:key="@string/pref_about_key"
+        android:title="@string/pref_about_title" />
+
 </PreferenceScreen>

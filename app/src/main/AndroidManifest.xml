@@ -42,6 +42,7 @@
             android:theme="@style/MyTheme"/>
         <receiver android:name="cs.umass.edu.prepare.reminders.NotificationPublisher"/>
         <activity android:name="cs.umass.edu.prepare.view.activities.SettingsActivity" />
+        <activity android:name=".view.activities.AboutActivity"/>
         <service android:name="cs.umass.edu.prepare.services.WearableService"/>
         <service android:name="cs.umass.edu.prepare.services.MetawearService"/>
         <service android:name="cs.umass.edu.prepare.services.DataService"/>

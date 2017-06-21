@@ -10,4 +10,7 @@
     <string name="pref_check_for_updates_key">check-for-updates</string>
     <string name="pref_check_for_updates_title">Check for Updates</string>
 
+    <string name="pref_about_key">about_preference</string>
+    <string name="pref_about_title">About</string>
+
 </resources>
