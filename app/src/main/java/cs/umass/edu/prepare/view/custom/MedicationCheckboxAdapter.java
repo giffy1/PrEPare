@@ -81,7 +81,7 @@ public class MedicationCheckboxAdapter extends BaseAdapter {
             }
         });
         BitmapDrawable medicationDrawable = new BitmapDrawable(context.getResources(), medications.get(position).getImage());
-        holder.imgMedication.setImageDrawable(medicationDrawable); //TODO
+        holder.imgMedication.setImageDrawable(medicationDrawable);
         return rowView[position];
     }
 
