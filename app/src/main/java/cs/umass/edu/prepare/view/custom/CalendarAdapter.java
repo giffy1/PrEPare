@@ -38,6 +38,16 @@ import cs.umass.edu.prepare.R;
 import cs.umass.edu.prepare.util.Utils;
 
 public class CalendarAdapter extends BaseAdapter {
+
+    /**
+     * Indicates the calendar type, either {@link #BASIC} for a traditional calendar
+     * or {@link #DETAILED} if each date should also display adherence overview.
+     */
+    public enum DisplayType {
+        BASIC,
+        DETAILED
+    }
+
 	private static final int FIRST_DAY_OF_WEEK = 0; // 0=Sunday, 1=Monday etc.
 	
 	private final Context mContext;
@@ -49,7 +59,8 @@ public class CalendarAdapter extends BaseAdapter {
     private Map<Calendar, Map<Medication, Adherence[]>> data = new TreeMap<>();
     private ArrayList<Medication> medications;
 
-    private boolean styleBasic = false; // by default show details in each date cell
+    /** Indicates whether calendar cells should display adherence details. By default show details in each date cell. **/
+    private DisplayType displayType = DisplayType.DETAILED;
 
     public CalendarAdapter(Context c, Calendar monthCalendar, Calendar selectedDate) {
     	month = monthCalendar;
@@ -71,9 +82,14 @@ public class CalendarAdapter extends BaseAdapter {
         this.data = data;
     }
 
-    // TODO: explain clearly styleBasic
-    public void setStyleBasic(boolean styleBasic){
-        this.styleBasic = styleBasic;
+    /**
+     * Sets the form in which the calendar should be displayed.
+     * @param displayType {@link DisplayType#BASIC} indicates that a traditional calendar should
+     *        be displayed. {@link DisplayType#DETAILED} indicates that each cell should contain
+     *        an overview of adherence details.
+     */
+    public void setDisplayType(DisplayType displayType){
+        this.displayType = displayType;
     }
 
     public int getCount() {
@@ -135,7 +151,7 @@ public class CalendarAdapter extends BaseAdapter {
     		date = "0"+date;
     	}
 
-        if (styleBasic){
+        if (displayType==DisplayType.BASIC){
             v.setMinimumHeight(0);
             return v;
         }

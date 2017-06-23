@@ -72,6 +72,10 @@ import cs.umass.edu.prepare.util.Utils;
 
 public class CalendarActivity extends AppCompatActivity {
 
+	/** used for debugging purposes */
+	@SuppressWarnings("unused")
+	private static final String TAG = CalendarActivity.class.getName();
+
 	/** Today's date. The final attribute assumes that the application is re-opened each day.
 	 *  TODO: It may be good to add a mechanism to update today each day. **/
 	private final Calendar today;
@@ -318,8 +322,16 @@ public class CalendarActivity extends AppCompatActivity {
 		refreshCalendar();
 	}
 
+	/**
+	 * Refreshes the view, including the adherence view and the calendar.
+	 */
 	private void refresh(){
-		adapter.setStyleBasic(displayDetailsView);
+		// if the details view below the calendar is visible, then the calendar should NOT show its adherence details in each cell
+		if (displayDetailsView) {
+			adapter.setDisplayType(CalendarAdapter.DisplayType.BASIC);
+		} else {
+			adapter.setDisplayType(CalendarAdapter.DisplayType.DETAILED);
+		}
 		adapter.setSelectedDate(selectedDate);
 		refreshCalendar();
 		if (displayDetailsView)
@@ -346,6 +358,7 @@ public class CalendarActivity extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {
+		// if the user presses the back button on the phone and the details view is visible, hide the details view.
 		if (displayDetailsView){
 			displayDetailsView = false;
 			refresh();
@@ -469,8 +482,13 @@ public class CalendarActivity extends AppCompatActivity {
 		dialog.show();
 	}
 
+	/**
+	 * Populates the details view with adherence data for a particular date.
+	 * @param dateKey corresponds to the selected date. Note that the date key must have zeroed
+	 *                out all fields excluding month, year and date.
+	 * @param insertPoint the parent to which the adherence views are to be added.
+	 */
 	private void insertDetailsForDate (final Calendar dateKey, ViewGroup insertPoint) {
-
 		final Map<Medication, Adherence[]> adherenceMap = adherenceData.get(dateKey);
 		for (final Medication medication : medications) {
 			View details = View.inflate(this, R.layout.view_adherence_details_full, null);
@@ -526,12 +544,17 @@ public class CalendarActivity extends AppCompatActivity {
 						break;
 				}
 			}
-
+			// set margins and add to parent
 			layoutParams.setMargins(0, 15, 0, 15);
-			insertPoint.addView(details, layoutParams); //, 1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+			insertPoint.addView(details, layoutParams);
 		}
 	}
 
+	/**
+	 * Updates the details view for a particular date.
+	 * @param dateKey corresponds to the selected date. Note that the date key must have zeroed
+	 *                out all fields excluding month, year and date.
+	 */
 	private void updateDetails(Calendar dateKey){
 		TextView txtDate = (TextView) findViewById(R.id.txtDate);
 		txtDate.setText(dayFormat.format(selectedDate.getTime()) + "\n" + selectedDate.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()));
@@ -539,14 +562,16 @@ public class CalendarActivity extends AppCompatActivity {
 		ViewGroup insertPoint = (ViewGroup) findViewById(R.id.details);
 		insertPoint.removeAllViews();
 
-		if (adherenceData != null) {
+		if (adherenceData == null) {
+			Log.w(TAG, "Warning : No adherence data found.");
+		} else {
 			if (adherenceData.containsKey(dateKey))
 				insertDetailsForDate(dateKey, insertPoint);
 		}
 	}
 
 	/**
-	 * Refreshes the activity_calendar view asynchronously and displays the selected month and year.
+	 * Refreshes the view asynchronously and displays the selected month and year.
 	 */
 	private void refreshCalendar() {
 		TextView title  = (TextView) findViewById(R.id.title);
