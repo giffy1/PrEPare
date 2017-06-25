@@ -576,7 +576,7 @@ public class CalendarActivity extends AppCompatActivity {
 	private void refreshCalendar() {
 		TextView title  = (TextView) findViewById(R.id.title);
 
-		adapter.refreshDays();
+		adapter.refresh();
 		adapter.notifyDataSetChanged();
 		handler.post(calendarUpdater);
 
@@ -589,7 +589,7 @@ public class CalendarActivity extends AppCompatActivity {
 	private final Runnable calendarUpdater = new Runnable() {
 		@Override
 		public void run() {
-			adapter.setData(adherenceData);
+			adapter.setAdherenceData(adherenceData);
 			adapter.setMedicationInfo(medications);
 			adapter.notifyDataSetChanged();
 		}
