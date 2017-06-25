@@ -44,8 +44,10 @@
     <string name="link_mbientlab">https://metawear.mbientlab.com</string>
     <string name="mobile_health_client_user_id">91.e6.eb.8d.65.ee.a5.e3.5a.b3</string>
 
-    <string name="title_connecting">Configuring…</string>
-    <string name="message_wait">Please wait while the device is configured.</string>
+    <string name="title_configuring">Configuring…</string>
+    <string name="message_configure_wait">Please wait while the device is configured.</string>
+    <string name="title_connecting">Connecting…</string>
+    <string name="message_connect_wait">Please wait while connecting to the device.</string>
     <string name="label_cancel">Cancel</string>
     <string name="text_add_reminder">ADD</string>
 
