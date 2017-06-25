@@ -19,12 +19,20 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.MonitorNotifier;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +40,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,7 +61,7 @@ import edu.umass.cs.MHLClient.client.MobileIOClient;
 
 import static android.support.v4.app.NotificationCompat.CATEGORY_CALL;
 
-public class DataService extends Service {
+public class DataService extends Service implements BeaconConsumer {
 
     /** used for debugging purposes */
     private static final String TAG = DataService.class.getName();
@@ -78,6 +87,8 @@ public class DataService extends Service {
     private MobileIOClient mClient;
 
     private Handler handler;
+
+    private BeaconManager beaconManager;
 
     /**
      * Loads the data from disk.
@@ -217,6 +228,28 @@ public class DataService extends Service {
             }
         }
         return null;
+    }
+
+    @Override
+    public void onBeaconServiceConnect() {
+        beaconManager.addRangeNotifier(new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
+
+                for (Beacon beacon : collection) {
+                    Log.i(TAG, "Detected Metawear beacon: " + beacon.getBluetoothAddress());
+                    Intent intent = new Intent(DataService.this, WearableService.class);
+                    intent.setAction(Constants.ACTION.START_SERVICE);
+                    intent.putExtra("timestamp", System.currentTimeMillis());
+                    intent.putExtra("UUID", region.getBluetoothAddress());
+                    startService(intent);
+                }
+            }
+        });
+
+        try {
+            beaconManager.startRangingBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
+        } catch (RemoteException e) {    }
     }
 
     public static class NotificationResponseReceiver extends BroadcastReceiver {
@@ -467,6 +500,10 @@ public class DataService extends Service {
 
     private void start() {
         Log.d(TAG, "start()");
+        beaconManager = BeaconManager.getInstanceForApplication(this);
+        beaconManager.getBeaconParsers().add(new BeaconParser().
+                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.bind(this);
         if (dataIO == null){
             dataIO = DataIO.getInstance(this);
             dataIO.addOnDataChangedListener(this::loadData); // reload data when changed
@@ -486,6 +523,7 @@ public class DataService extends Service {
     private void stop() {
         Log.i(TAG, "stop()");
         // broadcastMessage(Constants.MESSAGES.WEARABLE_SERVICE_STOPPED); // TODO
+        beaconManager.unbind(this);
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         try {
             broadcastManager.unregisterReceiver(receiver);
