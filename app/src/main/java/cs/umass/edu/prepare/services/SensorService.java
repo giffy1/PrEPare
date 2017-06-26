@@ -137,7 +137,7 @@ public abstract class SensorService extends Service implements ConnectionStateHa
     protected void start(){
         Log.d(TAG, "Service started");
         connectToServer();
-        registerSensors();
+//        registerSensors();
         onServiceStarted();
     }
 
