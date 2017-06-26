@@ -38,6 +38,7 @@ public class Constants {
         String PILL_INTAKE_RESPONSE_YES = "edu.umass.cs.prepare.action.pill-intake-response-yes";
         String PILL_INTAKE_RESPONSE_NO = "edu.umass.cs.prepare.action.pill-intake-response-no";
         String SCHEDULE_REMINDERS = "edu.umass.cs.prepare.action.schedule-reminders";
+        String PUSH_NOTIFICATION_TO_MSBAND = "edu.umass.cs.prepare.action.push-notification";
     }
 
     public interface SERVER_MESSAGE {

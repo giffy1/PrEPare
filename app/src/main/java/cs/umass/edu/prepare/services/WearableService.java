@@ -2,6 +2,7 @@ package cs.umass.edu.prepare.services;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -204,5 +205,16 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
         } catch (BandException | InterruptedException e) {
             // handle BandException
         }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null){
+            if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION.PUSH_NOTIFICATION_TO_MSBAND)){
+                Medication medication = (Medication) intent.getSerializableExtra(Constants.KEY.MEDICATION);
+                sendNotificationToWearable(medication);
+            }
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
 }

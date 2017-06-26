@@ -379,6 +379,11 @@ public class DataService extends Service implements BeaconConsumer {
             return;
         }
 
+        Intent intent = new Intent(DataService.this, WearableService.class);
+        intent.setAction(Constants.ACTION.PUSH_NOTIFICATION_TO_MSBAND);
+        intent.putExtra(Constants.KEY.MEDICATION, medication);
+        startService(intent);
+
         userResponded = false; // indicates whether user responded (either positively or negatively)
         broadcastPillIntakeGestureDetected(medication, timeTaken);
         requestUserConfirmation(medication, timeTaken);
