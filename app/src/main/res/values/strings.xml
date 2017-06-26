@@ -64,4 +64,6 @@
 
     <string name="about_app_version" formatted="false">Version %1$s</string>
     <string name="about_powered_by_metawear">Powered by Metawear</string>
+
+    <string name="wearable_service_notification">Wearable Service Running</string>
 </resources>
