@@ -143,7 +143,7 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
 
     @Override
     protected String getNotificationContentText() {
-        return "NOTIFICATION"; // TODO: // getString(R.string.wearable_service_notification);
+        return getString(R.string.wearable_service_notification);
     }
 
     @Override
@@ -180,14 +180,12 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
 
         long timestamp = System.currentTimeMillis(); //event.getTimestamp();
 
-//        if (dataIO.writeServer()) {
-            mClient.sendSensorReading(new AccelerometerReading(mUserID, "WEARABLE", "", timestamp,
-                    accelerometerX, accelerometerY, accelerometerZ));
-            mClient.sendSensorReading(new GyroscopeReading(mUserID, "WEARABLE", "", timestamp,
-                    gyroscopeX, gyroscopeY, gyroscopeZ));
-//        }
+        mClient.sendSensorReading(new AccelerometerReading(mUserID, "WEARABLE", "", timestamp,
+                accelerometerX, accelerometerY, accelerometerZ));
+        mClient.sendSensorReading(new GyroscopeReading(mUserID, "WEARABLE", "", timestamp,
+                gyroscopeX, gyroscopeY, gyroscopeZ));
 
-
+        // to broadcast to other application components e.g. to UI
 //        broadcaster.broadcastSensorReading(Constants.SENSOR_TYPE.ACCELEROMETER_WEARABLE, timestamp,
 //                accelerometerX, accelerometerY, accelerometerZ);
 //

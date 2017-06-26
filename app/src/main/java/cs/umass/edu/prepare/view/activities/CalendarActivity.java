@@ -63,6 +63,7 @@ import cs.umass.edu.prepare.data.Adherence;
 import cs.umass.edu.prepare.data.DataIO;
 import cs.umass.edu.prepare.main.CheckForUpdatesTask;
 import cs.umass.edu.prepare.services.DataService;
+import cs.umass.edu.prepare.services.WearableService;
 import cs.umass.edu.prepare.view.custom.CalendarAdapter;
 import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.view.gestures.CustomMotionEventListener;
@@ -273,9 +274,9 @@ public class CalendarActivity extends AppCompatActivity {
 
 		new CheckForUpdatesTask(this).execute(true);
 
-//		Intent wearableServiceIntent = new Intent(this, WearableService.class);
-//		wearableServiceIntent.setAction(Constants.ACTION.START_SERVICE);
-//		startService(wearableServiceIntent);
+		Intent wearableServiceIntent = new Intent(this, WearableService.class);
+		wearableServiceIntent.setAction(Constants.ACTION.START_SERVICE);
+		startService(wearableServiceIntent);
 
 		Intent dataServiceIntent = new Intent(this, DataService.class);
 		dataServiceIntent.setAction(Constants.ACTION.START_SERVICE);
