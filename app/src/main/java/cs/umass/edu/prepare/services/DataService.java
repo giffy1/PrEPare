@@ -229,6 +229,8 @@ public class DataService extends Service implements BeaconConsumer {
         return null;
     }
 
+    private Handler bandHandler = new Handler();
+
     @Override
     public void onBeaconServiceConnect() {
         beaconManager.addRangeNotifier(new RangeNotifier() {
@@ -238,10 +240,26 @@ public class DataService extends Service implements BeaconConsumer {
                 for (Beacon beacon : collection) {
                     Log.i(TAG, "Detected Metawear beacon: " + beacon.getBluetoothAddress());
                     Intent intent = new Intent(DataService.this, WearableService.class);
-                    intent.setAction(Constants.ACTION.START_SERVICE);
+                    intent.setAction(Constants.ACTION.START_SENSORS);
+                    // TODO : param keys 'timestamp' and 'UUID' should be moved into Constants file
                     intent.putExtra("timestamp", System.currentTimeMillis());
                     intent.putExtra("UUID", region.getBluetoothAddress());
                     startService(intent);
+
+                    // remove existing scheduled tasks
+                    bandHandler.removeCallbacksAndMessages(null);
+                    // stop sensors after specified time
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(DataService.this, WearableService.class);
+                            intent.setAction(Constants.ACTION.STOP_SENSORS);
+                            startService(intent);
+                        }
+                    };
+                    bandHandler.postDelayed(runnable, 20000); // TODO: How long?
+
+
                 }
             }
         });
