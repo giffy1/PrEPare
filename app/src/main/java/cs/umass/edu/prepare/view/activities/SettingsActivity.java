@@ -50,10 +50,13 @@ public class SettingsActivity extends PreferenceActivity {
         }
 
         private void initializeAboutPreference(){
-            findPreference(getString(R.string.pref_about_key)).setOnPreferenceClickListener(preference -> {
-                Intent intent = new Intent(getActivity(), AboutActivity.class);
-                startActivity(intent);
-                return true;
+            findPreference(getString(R.string.pref_about_key)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(SettingsFragment.this.getActivity(), AboutActivity.class);
+                    SettingsFragment.this.startActivity(intent);
+                    return true;
+                }
             });
         }
 
