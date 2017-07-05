@@ -29,7 +29,12 @@ public class AboutActivity extends AppCompatActivity{
         txtVersion.setText(String.format(Locale.getDefault(), getString(R.string.about_app_version), Utils.getVersionName(this)));
 
         View checkForUpdatesButton = findViewById(R.id.btnCheckForUpdates);
-        checkForUpdatesButton.setOnClickListener(view -> new CheckForUpdatesTask(AboutActivity.this).execute());
+        checkForUpdatesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new CheckForUpdatesTask(AboutActivity.this).execute();
+            }
+        });
 
         //when the user clicks the metawear icon, direct them to the main site
         ImageView metawearIcon = (ImageView) findViewById(R.id.metawearIcon);
