@@ -33,6 +33,8 @@ public class Constants {
         String NAVIGATE_TO_APP = "edu.umass.cs.my-activities-toolkit.action.navigate-to-app";
         String START_SERVICE = "edu.umass.cs.prepare.action.start-service";
         String STOP_SERVICE = "edu.umass.cs.prepare.action.stop-service";
+        String START_SENSORS = "edu.umass.cs.prepare.action.start-sensors";
+        String STOP_SENSORS = "edu.umass.cs.prepare.action.stop-sensors";
         String QUERY_BATTERY_LEVEL = "edu.umass.cs.prepare.action.query-battery-level";
         String QUERY_CONNECTION_STATE = "edu.umass.cs.prepare.action.query-connection-state";
         String PILL_INTAKE_RESPONSE_YES = "edu.umass.cs.prepare.action.pill-intake-response-yes";

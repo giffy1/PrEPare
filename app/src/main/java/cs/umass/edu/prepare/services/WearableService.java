@@ -1,9 +1,14 @@
 package cs.umass.edu.prepare.services;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.microsoft.band.BandClient;
@@ -22,7 +27,11 @@ import java.util.UUID;
 
 import cs.umass.edu.prepare.R;
 import cs.umass.edu.prepare.constants.Constants;
+import cs.umass.edu.prepare.data.DataIO;
 import cs.umass.edu.prepare.data.Medication;
+import cs.umass.edu.prepare.view.activities.CalendarActivity;
+import edu.umass.cs.MHLClient.client.ConnectionStateHandler;
+import edu.umass.cs.MHLClient.client.MobileIOClient;
 import edu.umass.cs.MHLClient.sensors.AccelerometerReading;
 import edu.umass.cs.MHLClient.sensors.GyroscopeReading;
 
@@ -40,13 +49,29 @@ import edu.umass.cs.MHLClient.sensors.GyroscopeReading;
  * @see BandClient
  * @see BandGyroscopeEventListener
  */
-public class WearableService extends SensorService implements BandGyroscopeEventListener {
+public class WearableService extends Service implements BandGyroscopeEventListener, ConnectionStateHandler {
 
     /** used for debugging purposes */
     private static final String TAG = WearableService.class.getName();
 
     /** The object which receives sensor data from the Microsoft Band */
     private BandClient bandClient = null;
+
+    /** Responsible for communicating with the data collection server. */
+    protected MobileIOClient mClient;
+
+    /** The user ID required to authenticate the server connection. */
+    protected String mUserID;
+
+    /** Gives access to persisted and in-memory data (adherence, medications, etc.) */
+    protected DataIO dataIO;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.i(TAG, "onCreate()");
+        dataIO = DataIO.getInstance(this);
+    }
 
     /**
      * Asynchronous task for connecting to the Microsoft Band accelerometer and gyroscope sensors.
@@ -65,8 +90,7 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
                 if (getConnectedBandClient()) {
                     broadcastStatus(getString(R.string.status_connected));
                     broadcastMessage(Constants.MESSAGES.WEARABLE_CONNECTED);
-                    bandClient.getSensorManager().registerGyroscopeEventListener(WearableService.this, SampleRate.MS16);
-                    onSensorStarted();
+
                 } else {
                     broadcastMessage(Constants.MESSAGES.WEARABLE_CONNECTION_FAILED);
                     broadcastStatus(getString(R.string.status_not_connected));
@@ -117,15 +141,20 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
         return ConnectionState.CONNECTED == bandClient.connect().await();
     }
 
-    @Override
+    /**
+     * Registers the accelerometer and gyroscope sensors.
+     */
     protected void registerSensors() {
-        new SensorSubscriptionTask().execute();
+        try {
+            bandClient.getSensorManager().registerGyroscopeEventListener(WearableService.this, SampleRate.MS16);
+        } catch (BandIOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * unregisters the sensors from the sensor service
      */
-    @Override
     public void unregisterSensors() {
         if (bandClient != null) {
             try {
@@ -137,18 +166,15 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
         }
     }
 
-    @Override
-    protected int getNotificationID() {
+    private int getNotificationID() {
         return Constants.NOTIFICATION_ID.BAND_SERVICE;
     }
 
-    @Override
-    protected String getNotificationContentText() {
+    private String getNotificationContentText() {
         return getString(R.string.wearable_service_notification);
     }
 
-    @Override
-    protected int getNotificationIconResourceID() {
+    private int getNotificationIconResourceID() {
         return R.drawable.ic_watch_white_24dp;
     }
 
@@ -198,23 +224,129 @@ public class WearableService extends SensorService implements BandGyroscopeEvent
     // TODO : call when pill intake gesture detected (happens in DataService, must notify this service from there).
     public void sendNotificationToWearable(Medication medication){
         try {
-            // send a dialog to the Band for one of our tiles
-            bandClient.getNotificationManager().vibrate(VibrationType.NOTIFICATION_ALARM);
-            bandClient.getNotificationManager().showDialog(UUID.randomUUID(),
-                    "You've taken a dose of " + medication.getName(), "If this is incorrect, please correct it on your phone.").await();
+            if (bandClient == null){ // if this happens then notifications will not be sent to the MS Band
+                Log.w(TAG, "Warning : Band Client is null.");
+            }else {
+                // send a dialog to the Band for one of our tiles
+                bandClient.getNotificationManager().vibrate(VibrationType.NOTIFICATION_ALARM);
+                bandClient.getNotificationManager().showDialog(UUID.randomUUID(),
+                        "You've taken a dose of " + medication.getName(), "If this is incorrect, please correct it on your phone.").await();
+            }
         } catch (BandException | InterruptedException e) {
             // handle BandException
         }
     }
 
+    /**
+     * Connects to the data collection server.
+     */
+    protected void connectToServer(){
+        mUserID = getString(R.string.mobile_health_client_user_id);
+        mClient = MobileIOClient.getInstance(this, mUserID);
+        mClient.setConnectionStateHandler(this);
+        mClient.connect();
+    }
+
+    /**
+     * Starts the sensor service in the foreground.
+     */
+    protected void start(){
+        Log.d(TAG, "Service started");
+        connectToServer();
+        new SensorSubscriptionTask().execute();
+        startForeground(4001, getNotification());
+    }
+
+    /**
+     * Stops the sensor service.
+     */
+    protected void stop(){
+        Log.d(TAG, "Service stopped");
+        unregisterSensors();
+//        if (client != null)
+//            client.disconnect(); //TODO
+        stopForeground(true);
+        stopSelf();
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null){
-            if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION.PUSH_NOTIFICATION_TO_MSBAND)){
+        if (intent != null && intent.getAction() != null){
+            if (intent.getAction().equals(Constants.ACTION.PUSH_NOTIFICATION_TO_MSBAND)){
                 Medication medication = (Medication) intent.getSerializableExtra(Constants.KEY.MEDICATION);
                 sendNotificationToWearable(medication);
+            } else if (intent.getAction().equals(Constants.ACTION.START_SERVICE)) {
+                start();
+            } else if (intent.getAction().equals(Constants.ACTION.STOP_SERVICE)) {
+                stop();
+            } else if (intent.getAction().equals(Constants.ACTION.START_SENSORS)) {
+                registerSensors();
+            } else if (intent.getAction().equals(Constants.ACTION.STOP_SENSORS)) {
+                unregisterSensors();
             }
+        } else {
+            Log.d(TAG, "Service restarted after killed by OS.");
+            start();
         }
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onConnected() {
+        Log.d(TAG, "Connected to server");
+        broadcastMessage(Constants.MESSAGES.SERVER_CONNECTION_SUCCEEDED);
+    }
+
+    @Override
+    public void onConnectionFailed(Exception e) {
+        e.printStackTrace();
+        Log.d(TAG, "Connection attempt failed.");
+        broadcastMessage(Constants.MESSAGES.SERVER_CONNECTION_FAILED);
+    }
+
+    /**
+     * Returns the notification displayed during background recording.
+     * @return the notification handle.
+     */
+    protected Notification getNotification(){
+        Intent notificationIntent = new Intent(this, CalendarActivity.class); //open main activity when user clicks on notification
+        notificationIntent.setAction(Constants.ACTION.NAVIGATE_TO_APP); //TODO
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        notificationIntent.putExtra(Constants.KEY.NOTIFICATION_ID, getNotificationID());
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent stopIntent = new Intent(this, this.getClass());
+        stopIntent.setAction(Constants.ACTION.STOP_SERVICE);
+        PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopIntent, 0);
+
+        // notify the user that the foreground service has started
+        return new NotificationCompat.Builder(this)
+                .setContentTitle(getString(R.string.app_name))
+                .setTicker(getString(R.string.app_name))
+                .setContentText(getNotificationContentText())
+                .setSmallIcon(getNotificationIconResourceID())
+                .setOngoing(true)
+                .setVibrate(new long[]{0, 50, 150, 200})
+                .setPriority(Notification.PRIORITY_MAX)
+                .addAction(R.drawable.ic_stop_white_24dp, "Stop Service", stopPendingIntent)
+                .setContentIntent(pendingIntent).build();
+    }
+
+    /**
+     * Broadcasts a message to other application components.
+     * @param message a message, as defined in {@link Constants.MESSAGES}
+     */
+    protected void broadcastMessage(int message) {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.KEY.MESSAGE, message);
+        intent.setAction(Constants.ACTION.BROADCAST_MESSAGE);
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+        manager.sendBroadcast(intent);
     }
 }

@@ -44,7 +44,6 @@
         <activity android:name="cs.umass.edu.prepare.view.activities.SettingsActivity" />
         <activity android:name=".view.activities.AboutActivity"/>
         <service android:name="cs.umass.edu.prepare.services.WearableService"/>
-        <service android:name="cs.umass.edu.prepare.services.MetawearService"/>
         <service android:name="cs.umass.edu.prepare.services.DataService"/>
         <receiver android:name="cs.umass.edu.prepare.services.DataService$NotificationResponseReceiver"/>
 
