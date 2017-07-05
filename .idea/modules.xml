@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CustomCalendar.iml" filepath="$PROJECT_DIR$/CustomCalendar.iml" />
       <module fileurl="file://$PROJECT_DIR$/PrEPare.iml" filepath="$PROJECT_DIR$/PrEPare.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
