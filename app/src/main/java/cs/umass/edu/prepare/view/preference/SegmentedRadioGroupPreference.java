@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
@@ -16,7 +17,10 @@ import info.hoang8f.android.segmented.SegmentedGroup;
 /**
  * @author Sean Noran
  */
-public class SwitchPreference extends Preference {
+public class SegmentedRadioGroupPreference extends Preference {
+
+    /** Used for debugging purposes. */
+    private static final String TAG = SegmentedRadioGroupPreference.class.getName();
 
     /**
      * the index of the default preference value in the case that it is not defined in the XML attributes.
@@ -34,24 +38,24 @@ public class SwitchPreference extends Preference {
      */
     private SegmentedGroup.OnCheckedChangeListener onCheckedChangeListener;
 
-    public SwitchPreference(Context context, AttributeSet attrs, int defStyle) {
+    public SegmentedRadioGroupPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs);
 
-        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.SwitchPreference, defStyle, 0);
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.SegmentedRadioGroupPreference, defStyle, 0);
         try {
-            options = a.getTextArray(R.styleable.SwitchPreference_android_entries);
+            options = a.getTextArray(R.styleable.SegmentedRadioGroupPreference_android_entries);
         }
         finally {
             a.recycle();
         }
     }
 
-    public SwitchPreference(Context context, AttributeSet attrs) {
+    public SegmentedRadioGroupPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.SwitchPreference, 0, 0);
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.SegmentedRadioGroupPreference, 0, 0);
         try {
-            options = a.getTextArray(R.styleable.SwitchPreference_android_entries);
+            options = a.getTextArray(R.styleable.SegmentedRadioGroupPreference_android_entries);
         }
         finally {
             a.recycle();
@@ -60,7 +64,17 @@ public class SwitchPreference extends Preference {
 
     @Override
     protected View onCreateView(ViewGroup parent) {
-        setWidgetLayoutResource(R.layout.switch_multiway);
+        // We need to use different layouts depending on the number of options, because inflating
+        // radio buttons programmatically results in strange visual artifacts and removing layouts
+        // programmatically is just as restrictive and produces very unclean code.
+        if (options.length == 2){
+            setWidgetLayoutResource(R.layout.segmented_radio_group_2);
+        } else if (options.length == 3){
+            setWidgetLayoutResource(R.layout.segmented_radio_group_3);
+        } else {
+            Log.w(TAG, "Warning : Segmented radio group preference only supports 2 or 3 radio buttons.");
+        }
+
         return super.onCreateView(parent);
     }
 
@@ -70,15 +84,28 @@ public class SwitchPreference extends Preference {
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-        SegmentedGroup toggleSwitch = (SegmentedGroup) rootView.findViewById(R.id.segmented_radio_group);
+        SegmentedGroup toggleSwitch;
+        // We need to use different layouts depending on the number of options, because inflating
+        // radio buttons programmatically results in strange visual artifacts and removing layouts
+        // programmatically is just as restrictive and produces very unclean code.
+        if (options.length == 2){
+            toggleSwitch = (SegmentedGroup) rootView.findViewById(R.id.segmented_radio_group_2);
+        } else if (options.length == 3){
+            toggleSwitch = (SegmentedGroup) rootView.findViewById(R.id.segmented_radio_group_3);
+        } else {
+            Log.w(TAG, "Warning : Segmented radio group preference only supports 2 or 3 radio buttons.");
+            return;
+        }
 
         final int[] radioButtonIDs = new int[options.length];
 
         for (int i = toggleSwitch.getChildCount() - 1; i >= 0; i--){
             RadioButton button = (RadioButton) toggleSwitch.getChildAt(i);
-            CharSequence option = options[i];
-            button.setText(option);
-            radioButtonIDs[i] = button.getId();
+            if (i < options.length) {
+                CharSequence option = options[i];
+                button.setText(option);
+                radioButtonIDs[i] = button.getId();
+            }
         }
         int selectedIndex = preferences.getInt(getKey(), defaultIndex);
         if (selectedIndex < radioButtonIDs.length)

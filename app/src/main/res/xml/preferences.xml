@@ -2,10 +2,15 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <cs.umass.edu.prepare.view.preference.SwitchPreference
+    <cs.umass.edu.prepare.view.preference.SegmentedRadioGroupPreference
         android:key="@string/pref_volume_key"
         android:entries="@array/preference_options_volume"
         android:defaultValue="@integer/pref_volume_index_default" />
+
+    <cs.umass.edu.prepare.view.preference.SegmentedRadioGroupPreference
+        android:key="@string/pref_time_type_key"
+        android:entries="@array/preference_options_time_type"
+        android:defaultValue="@integer/pref_time_type_index_default" />
 
     <EditTextPreference
         android:key="@string/pref_notification_text_key"

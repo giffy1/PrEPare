@@ -57,10 +57,16 @@
         <item>Sound</item>
     </string-array>
 
+    <string-array name="preference_options_time_type">
+        <item>AM/PM</item>
+        <item>24HR</item>
+    </string-array>
+
     <string name="default_notification_text" formatted="false">Don\'t forget your %1$s (%2$d mg)</string>
     <string name="adherence_text_missed">Missed!</string>
     <string name="adherence_text_unknown">Unknown</string>
     <integer name="pref_volume_index_default">1</integer>
+    <integer name="pref_time_type_index_default">0</integer>
 
     <string name="about_app_version" formatted="false">Version %1$s</string>
     <string name="about_powered_by_metawear">Powered by Metawear</string>

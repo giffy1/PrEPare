@@ -2,6 +2,7 @@
 <resources>
 
     <string name="pref_volume_key">volume-preference</string>
+    <string name="pref_time_type_key">time-preference</string>
 
     <string name="pref_notification_text_key">notification-text</string>
     <string name="pref_notification_text_title">Notification Text</string>
