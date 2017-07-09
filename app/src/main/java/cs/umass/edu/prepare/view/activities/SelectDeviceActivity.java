@@ -103,7 +103,7 @@ public class SelectDeviceActivity extends AppCompatActivity implements ScannerCo
     private ListView lstDevices;
 
     /** The mapping from medications to device UUIDs. */
-    private final Map<Medication, String> addressMapping = new HashMap<>();
+    private final Map<String, Medication> addressMapping = new HashMap<>();
 
     /** The dialog shown when configuring the device. */
     private ProgressDialog configureDialog;
@@ -152,28 +152,30 @@ public class SelectDeviceActivity extends AppCompatActivity implements ScannerCo
      */
     private void refreshListView(){
         for (int index = 0; index < lstDevices.getAdapter().getCount(); index++){
+            View listViewItem = lstDevices.getChildAt(index);
+            if (listViewItem == null)
+                continue;
             ScannedDeviceInfo deviceInfo = (ScannedDeviceInfo) lstDevices.getAdapter().getItem(index);
             String address = deviceInfo.btDevice.getAddress();
-            for (Medication medication : medications){
-                if (addressMapping.containsKey(medication)){
-                    if (addressMapping.get(medication).equals(address)){
-                        if (lstDevices.getChildAt(index) != null) {
-                            Log.i(TAG, address + ", " + index);
-                            // setClickable(false) and setEnabled(false) do not work here:
-                            View listViewItem = lstDevices.getChildAt(index);
-                            listViewItem.setOnClickListener(view -> Toast.makeText(SelectDeviceActivity.this,
-                                    "This device is already associated with " + medication.getName() +  ".",
-                                    Toast.LENGTH_LONG).show());
-                            listViewItem.setBackgroundColor(Color.rgb(235,235,228));
-                            TextView deviceAddress = (TextView) listViewItem.findViewById(com.mbientlab.bletoolbox.scanner.R.id.ble_mac_address);
-                            TextView deviceName = (TextView) listViewItem.findViewById(com.mbientlab.bletoolbox.scanner.R.id.ble_device);
-                            TextView deviceRSSI = (TextView) listViewItem.findViewById(com.mbientlab.bletoolbox.scanner.R.id.ble_rssi_value);
-                            deviceAddress.setTextColor(Color.rgb(155,155,140));
-                            deviceName.setTextColor(Color.rgb(155,155,140));
-                            deviceRSSI.setTextColor(Color.rgb(155,155,140));
-                        }
+            if (addressMapping.containsKey(address)){
+                Medication medication = addressMapping.get(address);
+
+                // setClickable(false) and setEnabled(false) do not work here:
+                listViewItem.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(SelectDeviceActivity.this,
+                                "This device is already associated with " + medication.getName() + ".",
+                                Toast.LENGTH_LONG).show();
                     }
-                }
+                });
+                listViewItem.setBackgroundColor(Color.rgb(235,235,228));
+                TextView deviceAddress = (TextView) listViewItem.findViewById(com.mbientlab.bletoolbox.scanner.R.id.ble_mac_address);
+                TextView deviceName = (TextView) listViewItem.findViewById(com.mbientlab.bletoolbox.scanner.R.id.ble_device);
+                TextView deviceRSSI = (TextView) listViewItem.findViewById(com.mbientlab.bletoolbox.scanner.R.id.ble_rssi_value);
+                deviceAddress.setTextColor(Color.rgb(155,155,140));
+                deviceName.setTextColor(Color.rgb(155,155,140));
+                deviceRSSI.setTextColor(Color.rgb(155,155,140));
             }
         }
         // TODO : For some reason, not refreshing when selected (but will refresh if the user touches the screen).
@@ -352,7 +354,7 @@ public class SelectDeviceActivity extends AppCompatActivity implements ScannerCo
      */
     private void onDeviceConfigured(final String address){
         SelectDeviceActivity.this.runOnUiThread(configureDialog::dismiss);
-        addressMapping.put(medications.get(medicationIndex), address);
+        addressMapping.put(address, medications.get(medicationIndex));
         refreshListView();
         medicationIndex++;
         if (medicationIndex >= medications.size()) {

@@ -75,7 +75,7 @@ public class DataService extends Service implements BeaconConsumer {
     private Map<Medication, Calendar[]> schedule = new HashMap<>();
 
     /** Maps a medication to a unique Mac Address. **/
-    private Map<Medication, String> addressMapping = new HashMap<>();
+    private Map<String, Medication> addressMapping = new HashMap<>();
 
     private Map<Medication, Integer> dosageMapping = new HashMap<>();
 
@@ -221,12 +221,7 @@ public class DataService extends Service implements BeaconConsumer {
             Log.w(TAG, "No address mapping found. Cannot get medication by UUID.");
             return null;
         }
-        for (Medication medication : medications){
-            if (addressMapping.get(medication).equals(bottleUUID)){
-                return medication;
-            }
-        }
-        return null;
+        return addressMapping.get(bottleUUID);
     }
 
     private Handler bandHandler = new Handler();

@@ -107,10 +107,8 @@ public class CalendarActivity extends AppCompatActivity {
 	/** Maps a medication to a schedule (a list of times to take the medication). **/
 	private Map<Medication, Calendar[]> dailySchedule;
 
-	/** Maps a medication to a unique Mac Address. TODO: reverse mapping **/
-	private Map<Medication, String> addressMapping;
-
-
+	/** Maps a medication to a unique Mac Address. **/
+	private Map<String, Medication> addressMapping;
 
 	/** Indicates whether the schedule details should be displayed, i.e. whether {@link #detailsView} is visible. **/
 	private boolean displayDetailsView = false;

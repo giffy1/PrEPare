@@ -34,7 +34,7 @@ public class DataIO {
     private Map<Medication, Calendar[]> schedule;
 
     /** Maps a medication to a unique Mac Address. **/
-    private Map<Medication, String> addressMapping;
+    private Map<String, Medication> addressMapping;
 
     private TreeSet<Integer> reminders;
 
@@ -77,7 +77,7 @@ public class DataIO {
         dosageMapping = (Map<Medication, Integer>) readObject(context, FILENAME.DOSAGE_MAPPING);
         schedule = (Map<Medication, Calendar[]>) readObject(context, FILENAME.SCHEDULE);
         adherenceData = (Map<Calendar, Map<Medication, Adherence[]>>) readObject(context, FILENAME.ADHERENCE_DATA);
-        addressMapping = (Map<Medication, String>) readObject(context, FILENAME.ADDRESS_MAPPING);
+        addressMapping = (Map<String, Medication>) readObject(context, FILENAME.ADDRESS_MAPPING);
         reminders = (TreeSet<Integer>) readObject(context, FILENAME.REMINDERS);
     }
 
@@ -170,7 +170,7 @@ public class DataIO {
         writeObject(context, dosageMapping, FILENAME.DOSAGE_MAPPING);
     }
 
-    public void setAddressMapping(Context context, Map<Medication, String> addressMapping){
+    public void setAddressMapping(Context context, Map<String, Medication> addressMapping){
         this.addressMapping = addressMapping;
         writeObject(context, addressMapping, FILENAME.ADDRESS_MAPPING);
     }
@@ -204,7 +204,7 @@ public class DataIO {
         return dosageMapping;
     }
 
-    public Map<Medication, String> getAddressMapping(Context context) {
+    public Map<String, Medication> getAddressMapping(Context context) {
         if (addressMapping == null)
             loadPreferences(context);
         return addressMapping;
