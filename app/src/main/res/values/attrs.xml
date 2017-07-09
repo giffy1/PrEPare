@@ -3,4 +3,7 @@
     <declare-styleable name="SegmentedRadioGroupPreference">
         <attr name="android:entries" />
     </declare-styleable>
+    <declare-styleable name="IntervalTimePicker">
+        <attr name="interval" format="integer" />
+    </declare-styleable>
 </resources>

@@ -6,28 +6,29 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -37,10 +38,11 @@ import java.util.TreeSet;
 
 import cs.umass.edu.prepare.R;
 import cs.umass.edu.prepare.constants.Constants;
-import cs.umass.edu.prepare.data.Medication;
 import cs.umass.edu.prepare.data.DataIO;
+import cs.umass.edu.prepare.data.Medication;
 import cs.umass.edu.prepare.services.DataService;
 import cs.umass.edu.prepare.util.Utils;
+import cs.umass.edu.prepare.view.custom.IntervalTimePicker;
 import cs.umass.edu.prepare.view.custom.MedicationArrayAdapter;
 
 /**
@@ -70,12 +72,6 @@ public class ReminderActivity extends BaseActivity {
 
     /** The custom adapter for displaying medication information in a list view. **/
     private MedicationArrayAdapter medicationAdapter;
-
-    /** The time picker for the first pill (AM). **/
-    private TimePicker timePickerAM;
-
-    /** The time picker for the second pill (PM). **/
-    private TimePicker timePickerPM;
 
     /** The position of the selected medication. **/
     private int selectedPosition=0;
@@ -171,21 +167,37 @@ public class ReminderActivity extends BaseActivity {
         ListView medicationsList = (ListView) findViewById(R.id.lvMedications);
         medicationsList.setAdapter(medicationAdapter);
         medicationAdapter.notifyDataSetChanged();
-        medicationsList.setOnItemClickListener((parent, view, position, arg3) -> {
-            selectedPosition = position;
-            view.setSelected(true);
+        medicationsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+                selectedPosition = position;
+                view.setSelected(true);
+            }
         });
-        medicationsList.addOnLayoutChangeListener((view, i, i1, i2, i3, i4, i5, i6, i7) -> medicationsList.getChildAt(0).setSelected(true));
+        medicationsList.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+                medicationsList.getChildAt(0).setSelected(true);
+            }
+        });
 
         Button adjustButton = (Button) findViewById(R.id.btn_adjust);
-        adjustButton.setOnClickListener(view -> {
-            if (selectedPosition >= 0) {
-                showMedicationAdjustmentDialog();
+        adjustButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedPosition >= 0) {
+                    ReminderActivity.this.showMedicationAdjustmentDialog();
+                }
             }
         });
 
         ListView lvReminders = (ListView) findViewById(R.id.lvReminders);
-        lvReminders.setOnItemClickListener((adapterView, view, i, l) -> showReminderOptionDialog(i));
+        lvReminders.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ReminderActivity.this.showReminderOptionDialog(i);
+            }
+        });
         adapter = new ArrayAdapter<> (this, android.R.layout.simple_list_item_1, android.R.id.text1, reminderStrings);
         lvReminders.setAdapter(adapter);
 
@@ -297,35 +309,29 @@ public class ReminderActivity extends BaseActivity {
         imgMedication.setText(String.format(Locale.getDefault(), "%d mg", dosageMapping.get(medication)));
         txtMedicationName.setText(medication.getName());
 
-        timePickerAM = (TimePicker) dialog.findViewById(R.id.timePickerAM);
-        timePickerPM = (TimePicker) dialog.findViewById(R.id.timePickerPM);
-
-        setTimePickerInterval(timePickerAM);
-        setTimePickerInterval(timePickerPM);
+        final IntervalTimePicker timePicker1 = (IntervalTimePicker) dialog.findViewById(R.id.timePicker1);
+        final IntervalTimePicker timePicker2 = (IntervalTimePicker) dialog.findViewById(R.id.timePicker2);
 
         Calendar[] schedule = dailySchedule.get(medication);
 
-        Calendar time = schedule[0];
-        View labelAM = dialog.findViewById(R.id.label_AM);
-        if (time == null) {
-            timePickerAM.setVisibility(View.INVISIBLE);
-            labelAM.setVisibility(View.INVISIBLE);
-        } else {
-            Utils.setTime(timePickerAM, time);
-            timePickerAM.setVisibility(View.VISIBLE);
-            labelAM.setVisibility(View.VISIBLE);
+        Calendar time1 = schedule[0];
+        Calendar time2 = schedule[1];
+
+        if (time1 != null){
+            timePicker1.setTime(time1);
         }
 
-        time = schedule[1];
-        View labelPM = dialog.findViewById(R.id.label_PM);
-        if (time == null) {
-            timePickerPM.setVisibility(View.INVISIBLE);
-            labelPM.setVisibility(View.INVISIBLE);
+        if (time2 == null) {
+            timePicker2.setVisibility(View.INVISIBLE);
         } else {
-            Utils.setTime(timePickerPM, time);
-            timePickerPM.setVisibility(View.VISIBLE);
-            labelPM.setVisibility(View.VISIBLE);
+            timePicker2.setTime(time2);
+            timePicker2.setVisibility(View.VISIBLE);
         }
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int timeFormatOption = preferences.getInt(getString(R.string.pref_time_type_key), getResources().getInteger(R.integer.pref_time_type_index_default));
+        timePicker1.setIs24HourView(timeFormatOption == 1);
+        timePicker2.setIs24HourView(timeFormatOption == 1);
 
         Button cancelButton = (Button) dialog.findViewById(R.id.btn_cancel);
         cancelButton.setOnClickListener(v -> dialog.dismiss());
@@ -333,17 +339,12 @@ public class ReminderActivity extends BaseActivity {
         Button saveButton = (Button) dialog.findViewById(R.id.btn_save);
         saveButton.setOnClickListener(v -> {
 
-            Calendar timeAM = Utils.getTime(timePickerAM);
-            Calendar timePM = Utils.getTime(timePickerPM);
-
             Calendar[] schedule1 = dailySchedule.get(medication);
             if (schedule1[0] != null) {
-                schedule1[0] = timeAM;
-                schedule1[0].set(Calendar.AM_PM, Calendar.AM);
+                schedule1[0] = timePicker1.getTime();
             }
             if (schedule1[1] != null) {
-                schedule1[1] = timePM;
-                schedule1[1].set(Calendar.AM_PM, Calendar.PM);
+                schedule1[1] = timePicker2.getTime();
             }
 
             if (medicationImage != null)
@@ -353,34 +354,44 @@ public class ReminderActivity extends BaseActivity {
             medicationAdapter.notifyDataSetChanged();
 
             // persist to disk
-            DataIO preferences = DataIO.getInstance(ReminderActivity.this);
-            preferences.setMedications(this, medications);
-            preferences.setSchedule(this, dailySchedule);
-
-            DataService.scheduleReminders(this);
+            // TODO : Why so slow???
+//            DataIO dataIO = DataIO.getInstance(ReminderActivity.this);
+//            dataIO.setMedications(this, medications);
+//            dataIO.setSchedule(this, dailySchedule);
+//
+//            DataService.scheduleReminders(this);
         });
 
         TextView takePhoto = (TextView) dialog.findViewById(R.id.take_photo);
-        takePhoto.setOnClickListener(view -> {
-            medicationImage = null; // reset
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(cameraIntent, CAMERA_REQUEST);
+        takePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                medicationImage = null; // reset
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                ReminderActivity.this.startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            }
         });
 
         TextView chooseFromGallery = (TextView) dialog.findViewById(R.id.choose_from_gallery);
-        chooseFromGallery.setOnClickListener(view -> {
-            medicationImage = null; // reset
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_REQUEST);
+        chooseFromGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                medicationImage = null; // reset
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                ReminderActivity.this.startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_REQUEST);
+            }
         });
 
         TextView refreshImage = (TextView) dialog.findViewById(R.id.default_medication_icon);
-        refreshImage.setOnClickListener(view -> {
-            medicationImage = medication.getDefaultImage();
-            BitmapDrawable medicationDrawable1 = new BitmapDrawable(getResources(), medicationImage);
-            imgMedication.setCompoundDrawablesWithIntrinsicBounds(null, medicationDrawable1, null, null);
+        refreshImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                medicationImage = medication.getDefaultImage();
+                BitmapDrawable medicationDrawable1 = new BitmapDrawable(ReminderActivity.this.getResources(), medicationImage);
+                imgMedication.setCompoundDrawablesWithIntrinsicBounds(null, medicationDrawable1, null, null);
+            }
         });
 
         dialog.show();
@@ -416,30 +427,6 @@ public class ReminderActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
-    }
-
-    private void setTimePickerInterval(TimePicker timePicker) {
-        Class<?> classForID;
-        Field field;
-        NumberPicker minutePicker;
-        // a bit of a hack, we can get and modify the time picker's number picker view
-        try {
-            classForID = Class.forName("com.android.internal.R$id");
-            field = classForID.getField("minute");
-            minutePicker = (NumberPicker) timePicker.findViewById(field.getInt(null));
-        }catch(ClassNotFoundException | NoSuchFieldException | IllegalAccessException e){
-            e.printStackTrace();
-            return;
-        }
-
-        minutePicker.setMinValue(0);
-        minutePicker.setMaxValue(60 / Constants.TIME_PICKER_INTERVAL - 1);
-        ArrayList<String> displayedValues = new ArrayList<>();
-        for (int i = 0; i < 60; i += Constants.TIME_PICKER_INTERVAL) {
-            displayedValues.add(String.format(Locale.getDefault(), "%02d", i));
-        }
-        minutePicker.setDisplayedValues(displayedValues.toArray(new String[0]));
-        minutePicker.setWrapSelectorWheel(true);
     }
 
 }
