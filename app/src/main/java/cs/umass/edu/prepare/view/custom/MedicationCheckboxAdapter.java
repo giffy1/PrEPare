@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -75,9 +76,12 @@ public class MedicationCheckboxAdapter extends BaseAdapter {
 
         holder.txtMedication.setText(medications.get(position).getName());
         holder.chkMedication.setChecked(true);
-        holder.chkMedication.setOnCheckedChangeListener((compoundButton, b) -> {
-            if (onCheckedChangeListener != null){
-                onCheckedChangeListener.onCheckedChange(position, rowView[position], b);
+        holder.chkMedication.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (onCheckedChangeListener != null) {
+                    onCheckedChangeListener.onCheckedChange(position, rowView[position], b);
+                }
             }
         });
         BitmapDrawable medicationDrawable = new BitmapDrawable(context.getResources(), medications.get(position).getImage());
