@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -28,7 +29,6 @@ import android.widget.Toast;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -37,11 +37,9 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import cs.umass.edu.prepare.R;
-import cs.umass.edu.prepare.constants.Constants;
 import cs.umass.edu.prepare.data.DataIO;
 import cs.umass.edu.prepare.data.Medication;
 import cs.umass.edu.prepare.services.DataService;
-import cs.umass.edu.prepare.util.Utils;
 import cs.umass.edu.prepare.view.custom.IntervalTimePicker;
 import cs.umass.edu.prepare.view.custom.MedicationArrayAdapter;
 
@@ -100,6 +98,10 @@ public class ReminderActivity extends BaseActivity {
 
     /** Human-readable reminder options to choose from, including "custom". */
     private final String[] optionStrings = {"None", "On time", "10 min before", "30 min before", "1 hour before", "Custom"};
+
+    private boolean isEditDialogOpen = false;
+
+    private Dialog dialog;
 
     /**
      * Loads the set of reminders from disk.
@@ -296,7 +298,8 @@ public class ReminderActivity extends BaseActivity {
      * Loads and displays the dialog for editing the activity_settings for a particular medication.
      */
     private void showMedicationAdjustmentDialog(){
-        final Dialog dialog = new Dialog(this);
+        isEditDialogOpen = true;
+        dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_adjust_medication);
 
         final Medication medication = medications.get(selectedPosition);
@@ -332,6 +335,13 @@ public class ReminderActivity extends BaseActivity {
         int timeFormatOption = preferences.getInt(getString(R.string.pref_time_type_key), getResources().getInteger(R.integer.pref_time_type_index_default));
         timePicker1.setIs24HourView(timeFormatOption == 1);
         timePicker2.setIs24HourView(timeFormatOption == 1);
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                isEditDialogOpen = false;
+            }
+        });
 
         Button cancelButton = (Button) dialog.findViewById(R.id.btn_cancel);
         cancelButton.setOnClickListener(v -> dialog.dismiss());
@@ -426,6 +436,16 @@ public class ReminderActivity extends BaseActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // if the user presses the back button when the dialog is visible, close it.
+        if (isEditDialogOpen){
+            dialog.dismiss();
+        } else {
+            super.onBackPressed();
         }
     }
 
