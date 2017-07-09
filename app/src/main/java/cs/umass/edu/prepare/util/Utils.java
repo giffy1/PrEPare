@@ -96,42 +96,6 @@ public class Utils {
     }
 
     /**
-     * Sets the time of the given time picker to the specified time.
-     * @param clock the time picker being modified.
-     * @param time a time encoded in a {@link Calendar} object. Only the hour and minute fields are relevant.
-     */
-    @SuppressWarnings("deprecation")
-    public static void setTime(TimePicker clock, Calendar time){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            clock.setHour(time.get(Calendar.HOUR));
-            clock.setMinute(time.get(Calendar.MINUTE) / Constants.TIME_PICKER_INTERVAL);
-        } else {
-            clock.setCurrentHour(time.get(Calendar.HOUR_OF_DAY));
-            clock.setCurrentMinute(time.get(Calendar.MINUTE) / Constants.TIME_PICKER_INTERVAL);
-        }
-    }
-
-    /**
-     * Acquires the time from the given time picker. Note the time picker must have a
-     * minute interval of {@link Constants#TIME_PICKER_INTERVAL}.
-     * @param clock the time picker.
-     * @return a {@link Calendar} object encoding the time. Only the hour and minute fields are relevant.
-     * All other fields refer to the current date.
-     */
-    @SuppressWarnings("deprecation")
-    public static Calendar getTime(TimePicker clock){
-        Calendar time = Calendar.getInstance();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            time.set(Calendar.HOUR, clock.getHour() % 12);
-            time.set(Calendar.MINUTE, Constants.TIME_PICKER_INTERVAL * clock.getMinute());
-        }else {
-            time.set(Calendar.HOUR, clock.getCurrentHour() % 12);
-            time.set(Calendar.MINUTE, Constants.TIME_PICKER_INTERVAL * clock.getCurrentMinute());
-        }
-        return time;
-    }
-
-    /**
      * Acquires the time from the given unmodified time picker, i.e. its minute interval is 1.
      * @param clock the time picker.
      * @return a {@link Calendar} object encoding the time. Only the hour and minute fields are relevant.
@@ -206,7 +170,7 @@ public class Utils {
         Calendar time2Med3 = Calendar.getInstance();
         time2Med3.set(Calendar.HOUR_OF_DAY, 17);
         time2Med3.set(Calendar.MINUTE, 0);
-        dailySchedule.put(medications.get(2), new Calendar[]{null, time2Med3});
+        dailySchedule.put(medications.get(2), new Calendar[]{time2Med3, null});
 
         Calendar time1Med4 = Calendar.getInstance();
         time1Med4.set(Calendar.HOUR_OF_DAY, 10);
