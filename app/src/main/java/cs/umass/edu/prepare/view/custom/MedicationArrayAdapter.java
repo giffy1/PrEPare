@@ -1,7 +1,9 @@
 package cs.umass.edu.prepare.view.custom;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +26,7 @@ public class MedicationArrayAdapter extends BaseAdapter {
     private final Map<Medication, Integer> dosageMapping;
     private final Map<Medication, Calendar[]> dailySchedule;
     private final Context context;
-    private final SimpleDateFormat dateFormat = Constants.DATE_FORMAT.AM_PM;
+    private final SimpleDateFormat dateFormat;
 
     private LayoutInflater inflater=null;
     private TextView dataView, imageView;
@@ -37,6 +39,14 @@ public class MedicationArrayAdapter extends BaseAdapter {
         this.context = context;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         rowView = new View[medications.size()];
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int timeFormatOption = preferences.getInt(context.getString(R.string.pref_time_type_key), context.getResources().getInteger(R.integer.pref_time_type_index_default));
+        if (timeFormatOption == 0) {
+            dateFormat = Constants.DATE_FORMAT.AM_PM;
+        } else {
+            dateFormat = Constants.DATE_FORMAT._24_HR;
+        }
     }
     @Override
     public int getCount() {
