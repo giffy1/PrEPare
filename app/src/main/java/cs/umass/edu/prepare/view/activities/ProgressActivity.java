@@ -2,6 +2,7 @@ package cs.umass.edu.prepare.view.activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.widget.ListView;
@@ -155,10 +156,12 @@ public class ProgressActivity extends BaseActivity {
         });
 
         RadioGroup radioPlotType = (RadioGroup) findViewById(R.id.radio_plot_type);
-        // TODO : For some reason, using lambda expression here causes exception:
-        radioPlotType.setOnCheckedChangeListener((radioGroup, id) -> {
-            byMonth = (id==R.id.radio_by_month);
-            updatePlot();
+        radioPlotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int id) {
+                byMonth = (id == R.id.radio_by_month);
+                ProgressActivity.this.updatePlot();
+            }
         });
 
         updatePlot();
