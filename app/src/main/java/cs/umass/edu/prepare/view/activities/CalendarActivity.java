@@ -119,7 +119,7 @@ public class CalendarActivity extends AppCompatActivity {
 	private View detailsView;
 
 	/** Used for formatting time of day. **/
-	private final SimpleDateFormat timeFormat = Constants.DATE_FORMAT.AM_PM; // TODO: Allow customization (preferences)
+	private SimpleDateFormat timeFormat = Constants.DATE_FORMAT.AM_PM;
 
 	/** Used for formatting dates in mm/dd format. **/
 	private final SimpleDateFormat dayFormat = Constants.DATE_FORMAT.MONTH_DAY;
@@ -167,6 +167,19 @@ public class CalendarActivity extends AppCompatActivity {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Constants.ACTION.BROADCAST_MESSAGE);
 		broadcastManager.registerReceiver(receiver, filter);
+	}
+
+	@Override
+	protected void onPostResume() {
+		super.onPostResume();
+
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		int timeFormatOption = preferences.getInt(getString(R.string.pref_time_type_key), getResources().getInteger(R.integer.pref_time_type_index_default));
+		if (timeFormatOption == 0) {
+			timeFormat = Constants.DATE_FORMAT.AM_PM;
+		} else {
+			timeFormat = Constants.DATE_FORMAT._24_HR;
+		}
 	}
 
 	@Override
@@ -237,7 +250,12 @@ public class CalendarActivity extends AppCompatActivity {
 		previous.setOnClickListener(v13 -> previousMonth());
 
 		TextView next  = (TextView) findViewById(R.id.next);
-		next.setOnClickListener(v1 -> nextMonth());
+		next.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v1) {
+				CalendarActivity.this.nextMonth();
+			}
+		});
 
 		detailsView = findViewById(R.id.details);
 
