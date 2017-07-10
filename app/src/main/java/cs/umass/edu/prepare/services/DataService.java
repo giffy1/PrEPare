@@ -236,9 +236,8 @@ public class DataService extends Service implements BeaconConsumer {
                     Log.i(TAG, "Detected Metawear beacon: " + beacon.getBluetoothAddress());
                     Intent intent = new Intent(DataService.this, WearableService.class);
                     intent.setAction(Constants.ACTION.START_SENSORS);
-                    // TODO : param keys 'timestamp' and 'UUID' should be moved into Constants file
-                    intent.putExtra("timestamp", System.currentTimeMillis());
-                    intent.putExtra("UUID", region.getBluetoothAddress());
+                    intent.putExtra(Constants.KEY.TIMESTAMP, System.currentTimeMillis());
+                    intent.putExtra(Constants.KEY.UUID, region.getBluetoothAddress());
                     startService(intent);
 
                     // remove existing scheduled tasks

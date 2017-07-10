@@ -83,6 +83,8 @@ public class Constants {
         String MEDICATION = "edu.umass.cs.prepare.key.medication";
         String TIME_TAKEN = "edu.umass.cs.prepare.key.time-taken";
         String NOTIFICATION_ID = "edu.umass.cs.prepare.key.notification-id";
+        String TIMESTAMP = "edu.umass.cs.prepare.key.timestamp";
+        String UUID = "edu.umass.cs.prepare.key.uuid";
     }
 
     public interface NOTIFICATION_ID {
