@@ -221,7 +221,6 @@ public class WearableService extends Service implements BandGyroscopeEventListen
 
     }
 
-    // TODO : call when pill intake gesture detected (happens in DataService, must notify this service from there).
     public void sendNotificationToWearable(Medication medication){
         try {
             if (bandClient == null){ // if this happens then notifications will not be sent to the MS Band
@@ -316,7 +315,7 @@ public class WearableService extends Service implements BandGyroscopeEventListen
      */
     protected Notification getNotification(){
         Intent notificationIntent = new Intent(this, CalendarActivity.class); //open main activity when user clicks on notification
-        notificationIntent.setAction(Constants.ACTION.NAVIGATE_TO_APP); //TODO
+        notificationIntent.setAction(Constants.ACTION.NAVIGATE_TO_APP);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         notificationIntent.putExtra(Constants.KEY.NOTIFICATION_ID, getNotificationID());
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);

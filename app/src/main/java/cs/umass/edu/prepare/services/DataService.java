@@ -657,7 +657,6 @@ public class DataService extends Service implements BeaconConsumer {
                 getString(R.string.default_notification_text));
         builder.setContentText(String.format(notificationText, medication.getName(), dosageMapping.get(medication)));
         builder.setLargeIcon(medication.getImage());
-        // TODO : after API 23, you can use the medication image as the small icon; before that, use the pill icon
         // see https://stackoverflow.com/questions/23836920/how-to-set-bitmap-as-notification-icon-in-android
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             builder.setSmallIcon(Icon.createWithBitmap(medication.getImage()));
