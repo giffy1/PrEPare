@@ -545,7 +545,7 @@ public class DataService extends Service implements BeaconConsumer {
 
     private void stop() {
         Log.i(TAG, "stop()");
-        // broadcastMessage(Constants.MESSAGES.WEARABLE_SERVICE_STOPPED); // TODO
+        broadcastMessage(Constants.MESSAGES.WEARABLE_SERVICE_STOPPED);
         beaconManager.unbind(this);
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
         try {
