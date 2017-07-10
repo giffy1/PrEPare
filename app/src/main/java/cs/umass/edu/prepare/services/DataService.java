@@ -288,9 +288,16 @@ public class DataService extends Service implements BeaconConsumer {
     private void requestUserConfirmation(Medication medication, Calendar timeTaken){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setVibrate(Constants.NOTIFICATION_PATTERN);
-        // TODO: uncomment for sound, also let user customize
-//        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//        builder.setSound(alarmSound);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int volumeOption = preferences.getInt(getString(R.string.pref_volume_key), getResources().getInteger(R.integer.pref_volume_index_default));
+        if (volumeOption > 0){
+            builder.setVibrate(Constants.NOTIFICATION_PATTERN);
+        }
+        if (volumeOption == 2){
+            Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            builder.setSound(alarmSound);
+        }
 
         String timeTakenStr = Constants.DATE_FORMAT.FULL_AM_PM.format(timeTaken.getTime());
         String prompt = getString(R.string.notification_gesture_detected_text, medication.getName(), timeTakenStr);
