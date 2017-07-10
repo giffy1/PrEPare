@@ -373,7 +373,7 @@ public class DataService extends Service implements BeaconConsumer {
         if (medicationSchedule != null) {
             int threshold = 90; // 2 hr before, 4 hr after
             // TODO : Must decide if first or second pill (may be tricky if taken sometime in between)
-            int differenceInMin = medicationSchedule[0].get(Calendar.MINUTE) + 60 * medicationSchedule[0].get(Calendar.HOUR_OF_DAY); // TODO hour or hour of day?
+            int differenceInMin = medicationSchedule[0].get(Calendar.MINUTE) + 60 * medicationSchedule[0].get(Calendar.HOUR_OF_DAY);
             if (differenceInMin <= threshold) {
                 medicationAdherence[0] = new Adherence(Adherence.AdherenceType.TAKEN, timeTaken);
             } else {
