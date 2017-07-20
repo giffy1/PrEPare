@@ -129,12 +129,11 @@ public class DataService extends Service implements BeaconConsumer {
             JSONArray medicationSchedule = newSchedule.getJSONArray(medication.getName());
             String timeAM = medicationSchedule.getString(0);
             String timePM = medicationSchedule.getString(1);
-            // TODO : should time be AM/PM or 24HR?
             Calendar calendarAM, calendarPM;
             if (timeAM.equals("null")){
                 calendarAM = null;
             } else {
-                Date dateAM = Constants.DATE_FORMAT.AM_PM.parse(timeAM + " AM");
+                Date dateAM = Constants.DATE_FORMAT._24_HR.parse(timeAM);
                 calendarAM = Calendar.getInstance();
                 calendarAM.setTime(dateAM);
             }
@@ -142,7 +141,7 @@ public class DataService extends Service implements BeaconConsumer {
             if (timePM.equals("null")){
                 calendarPM = null;
             } else {
-                Date datePM = Constants.DATE_FORMAT.AM_PM.parse(timePM + " PM");
+                Date datePM = Constants.DATE_FORMAT._24_HR.parse(timePM);
                 calendarPM = Calendar.getInstance();
                 calendarPM.setTime(datePM);
             }
@@ -178,7 +177,7 @@ public class DataService extends Service implements BeaconConsumer {
 
                 Adherence adherenceAM = null;
                 if (adherenceType_AM.equals("FUTURE")) {
-                    Date dateTimeAM = Constants.DATE_FORMAT.AM_PM.parse(time_AM + " AM");
+                    Date dateTimeAM = Constants.DATE_FORMAT._24_HR.parse(time_AM);
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(dateTimeAM);
                     adherenceAM = new Adherence(Adherence.AdherenceType.FUTURE, cal);
@@ -189,7 +188,7 @@ public class DataService extends Service implements BeaconConsumer {
 
                 Adherence adherencePM = null;
                 if (adherenceType_PM.equals("FUTURE")) {
-                    Date dateTimePM = Constants.DATE_FORMAT.AM_PM.parse(time_PM + " PM");
+                    Date dateTimePM = Constants.DATE_FORMAT._24_HR.parse(time_PM);
                     Calendar cal2 = Calendar.getInstance();
                     cal2.setTime(dateTimePM);
                     adherencePM = new Adherence(Adherence.AdherenceType.FUTURE, cal2);
