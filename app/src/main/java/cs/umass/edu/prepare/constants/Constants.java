@@ -29,8 +29,12 @@ public class Constants {
     /** Intent actions used to communicate between the main UI and the sensor service
      * @see android.content.Intent */
     public interface ACTION {
+        String REQUEST_BLUETOOTH = "edu.umass.cs.prepare.action.request-bluetooth";
+        String ATTEMPT_BAND_RECONNECT = "edu.umass.cs.prepare.action.attempt-band-reconnect";
+        String BROADCAST_EXCEPTION = "edu.umass.cs.prepare.action.broadcast-exception";
         String BROADCAST_MESSAGE = "edu.umass.cs.my-activities-toolkit.action.broadcast-message";
         String NAVIGATE_TO_APP = "edu.umass.cs.my-activities-toolkit.action.navigate-to-app";
+        String CANCEL = "edu.umass.cs.prepare.action.cancel";
         String START_SERVICE = "edu.umass.cs.prepare.action.start-service";
         String STOP_SERVICE = "edu.umass.cs.prepare.action.stop-service";
         String START_SENSORS = "edu.umass.cs.prepare.action.start-sensors";
@@ -73,6 +77,9 @@ public class Constants {
         int PILL_INTAKE_GESTURE_DETECTED = 21;
         int PILL_INTAKE_GESTURE_CONFIRMED = 22;
         int PILL_INTAKE_GESTURE_DENIED = 23;
+        int WEARABLE_NOT_PAIRED = 24;
+        int WEARABLE_CONNECTING = 25;
+        int WEARABLE_UNREGISTER_SENSORS_FAILED = 26;
     }
 
     /**
@@ -85,6 +92,7 @@ public class Constants {
         String NOTIFICATION_ID = "edu.umass.cs.prepare.key.notification-id";
         String TIMESTAMP = "edu.umass.cs.prepare.key.timestamp";
         String UUID = "edu.umass.cs.prepare.key.uuid";
+        String EXCEPTION = "edu.umass.cs.prepare.key.exception";
     }
 
     public interface NOTIFICATION_ID {

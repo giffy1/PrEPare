@@ -71,5 +71,14 @@
     <string name="about_app_version" formatted="false">Version %1$s</string>
     <string name="about_powered_by_metawear">Powered by Metawear</string>
 
-    <string name="wearable_service_notification">Wearable Service Running</string>
+    <string name="wearable_service_notification">Connected to MS Band.</string>
+    <string name="wearable_sensors_notification">Collecting data from MS Band.</string>
+    <string name="wearable_connection_failed_notification">Failed to connect to MS Band.</string>
+    <string name="wearable_connecting_notification">Connecting to MS Band…</string>
+    <string name="notification_action_try_again">Try Again</string>
+    <string name="notification_action_stop_service">Stop Service</string>
+    <string name="notification_action_cancel">Cancel</string>
+    <string name="wearable_bluetooth_disabled_notification">Bluetooth is disabled. Please enable it to connect to the MS Band.</string>
+    <string name="notification_action_enable_bluetooth">Enable Bluetooth</string>
+    <string name="wearable_bluetooth_not_supported_notification">Bluetooth is not supported on your device.</string>
 </resources>
