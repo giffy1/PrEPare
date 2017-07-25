@@ -166,37 +166,42 @@ public class DataService extends Service implements BeaconConsumer {
             for (Medication medication : medications) {
                 Log.i(TAG, medication.getName());
                 String medicationKey = medication.getName();
-                JSONArray adherence = medicationAdherenceJSON.getJSONArray(medicationKey);
-                JSONArray adherenceAM_JSON = adherence.getJSONArray(0);
-                JSONArray adherencePM_JSON = adherence.getJSONArray(1);
+                JSONArray adherenceForMedication = medicationAdherenceJSON.getJSONArray(medicationKey);
 
-                String adherenceType_AM = adherenceAM_JSON.getString(0);
-                String time_AM = adherenceAM_JSON.getString(1);
-                String adherenceType_PM = adherencePM_JSON.getString(0);
-                String time_PM = adherencePM_JSON.getString(1);
+                Adherence[] adherenceArray = new Adherence[2];
+                for (int i = 0; i < 2; i++){
+                    JSONArray adherenceJSON = adherenceForMedication.getJSONArray(i);
+                    String adherenceType = adherenceJSON.getString(0);
+                    String timeStr = adherenceJSON.getString(1);
 
-                Adherence adherenceAM = null;
-                if (adherenceType_AM.equals("FUTURE")) {
-                    Date dateTimeAM = Constants.DATE_FORMAT._24_HR.parse(time_AM);
+                    Date dateTime = Constants.DATE_FORMAT._24_HR.parse(timeStr);
                     Calendar cal = Calendar.getInstance();
-                    cal.setTime(dateTimeAM);
-                    adherenceAM = new Adherence(Adherence.AdherenceType.FUTURE, cal);
+                    cal.setTime(dateTime);
 
-                } else if (adherenceType_AM.equals("NONE")) { // assume NONE or FUTURE
-                    adherenceAM = new Adherence(Adherence.AdherenceType.NONE, null);
+                    final Adherence adherence;
+                    switch (adherenceType){
+                        case "FUTURE":
+                            adherence = new Adherence(Adherence.AdherenceType.FUTURE, cal);
+                            break;
+                        case "NONE":
+                            adherence = new Adherence(Adherence.AdherenceType.NONE, cal);
+                            break;
+                        case "MISSED":
+                            adherence = new Adherence(Adherence.AdherenceType.MISSED, null);
+                            break;
+                        case "TAKEN_EARLY_OR_LATE":
+                            adherence = new Adherence(Adherence.AdherenceType.TAKEN_EARLY_OR_LATE, cal);
+                            break;
+                        case "TAKEN":
+                            adherence = new Adherence(Adherence.AdherenceType.TAKEN, cal);
+                            break;
+                        default:
+                            adherence = null;
+                    }
+                    adherenceArray[i] = adherence;
                 }
 
-                Adherence adherencePM = null;
-                if (adherenceType_PM.equals("FUTURE")) {
-                    Date dateTimePM = Constants.DATE_FORMAT._24_HR.parse(time_PM);
-                    Calendar cal2 = Calendar.getInstance();
-                    cal2.setTime(dateTimePM);
-                    adherencePM = new Adherence(Adherence.AdherenceType.FUTURE, cal2);
-                } else if (adherenceType_PM.equals("NONE")) { // assume NONE or FUTURE
-                    adherencePM = new Adherence(Adherence.AdherenceType.NONE, null);
-                }
-
-                medicationAdherence.put(medication, new Adherence[]{adherenceAM, adherencePM});
+                medicationAdherence.put(medication, adherenceArray);
             }
             Calendar dateInfo = Calendar.getInstance();
             // TODO : other dateKey method doesn't work
@@ -487,8 +492,6 @@ public class DataService extends Service implements BeaconConsumer {
                         } catch (JSONException | ParseException e){
                             e.printStackTrace(); // TODO revert on error? Currently not respecting ACID properties
                         }
-
-
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
