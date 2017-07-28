@@ -594,18 +594,26 @@ public class DataService extends Service implements BeaconConsumer {
      */
     private void scheduleReminders(){
         int notificationID = 1001; // TODO : cancel alarms before rescheduling, not just when rescheduling a particular notification
-        if (reminders == null) return; // TODO : initialize? Also, always set reminder 3 hr 55 min after ideal time
         for (Medication medication : medications){
             Calendar[] medicationSchedule = schedule.get(medication);
             for (Calendar time : medicationSchedule){
                 if (time != null) {
-                    for (int numberOfMinutesPrior : reminders) {
-                        Calendar alarmTime = (Calendar) time.clone();
-                        alarmTime.add(Calendar.MINUTE, -numberOfMinutesPrior);
-                        if (alarmTime.before(Calendar.getInstance())) {
-                            alarmTime.add(Calendar.DATE, 1); // start tomorrow if the alarm should have happened already today
+                    Calendar finalTime = (Calendar) time.clone();
+                    finalTime.add(Calendar.HOUR, 4);
+                    finalTime.add(Calendar.MINUTE, -5);
+                    if (finalTime.before(Calendar.getInstance())) {
+                        finalTime.add(Calendar.DATE, 1); // start tomorrow if the alarm should have happened already today
+                    }
+                    scheduleDailyNotification(getNotification(time, medication), notificationID++, finalTime);
+                    if (reminders != null) {
+                        for (int numberOfMinutesPrior : reminders) {
+                            Calendar alarmTime = (Calendar) time.clone();
+                            alarmTime.add(Calendar.MINUTE, -numberOfMinutesPrior);
+                            if (alarmTime.before(Calendar.getInstance())) {
+                                alarmTime.add(Calendar.DATE, 1); // start tomorrow if the alarm should have happened already today
+                            }
+                            scheduleDailyNotification(getNotification(time, medication), notificationID++, alarmTime);
                         }
-                        scheduleDailyNotification(getNotification(time, medication), notificationID++, alarmTime);
                     }
                 }
             }
