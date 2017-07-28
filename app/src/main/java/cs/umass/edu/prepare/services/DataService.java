@@ -582,6 +582,22 @@ public class DataService extends Service implements BeaconConsumer {
     }
 
     /**
+     * Cancels all previously set alarms. TODO : Check that this works. Apparently, the intents must match.
+     * Not sure if that means that the notificationIntent must be the EXACT same as in scheduleDailyNotification().
+     * Also, we're working under the assumption that there won't be more than 100 notifications.
+     */
+    private void cancelAlarms(){
+        for (int notificationID = 1001; notificationID < 1099; notificationID++) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent notificationIntent = new Intent(this, NotificationPublisher.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    this, notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            alarmManager.cancel(pendingIntent);
+        }
+    }
+
+    /**
      * Schedules reminders for all medications.
      *
      * Note that when setting reminders using the {@link AlarmManager}, notifications are not
@@ -593,7 +609,8 @@ public class DataService extends Service implements BeaconConsumer {
      * Notification IDs for reminders start at 1001, so don't fire notifications with IDs in the range 1001-1010.
      */
     private void scheduleReminders(){
-        int notificationID = 1001; // TODO : cancel alarms before rescheduling, not just when rescheduling a particular notification
+        cancelAlarms();
+        int notificationID = 1001;
         for (Medication medication : medications){
             Calendar[] medicationSchedule = schedule.get(medication);
             for (Calendar time : medicationSchedule){
