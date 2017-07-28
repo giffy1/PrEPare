@@ -365,11 +365,11 @@ public class ReminderActivity extends BaseActivity {
 
             // persist to disk
             // TODO : Why so slow???
-//            DataIO dataIO = DataIO.getInstance(ReminderActivity.this);
-//            dataIO.setMedications(this, medications);
-//            dataIO.setSchedule(this, dailySchedule);
-//
-//            DataService.scheduleReminders(this);
+            DataIO dataIO = DataIO.getInstance(ReminderActivity.this);
+            dataIO.setMedications(this, medications);
+            dataIO.setSchedule(this, dailySchedule);
+
+            DataService.scheduleReminders(this);
         });
 
         TextView takePhoto = (TextView) dialog.findViewById(R.id.take_photo);
